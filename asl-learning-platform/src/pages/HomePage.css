@@ -1,0 +1,39 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.home__hero {
+  max-width: 640px;
+}
+
+.home__hero h1 {
+  font-size: 2.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.home__hero p {
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+}
+
+.home__cta {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.home__features {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.home__features h3 {
+  margin-top: 0;
+}
+
+.home__features p {
+  color: var(--color-text-muted);
+  margin-bottom: 0;
+}

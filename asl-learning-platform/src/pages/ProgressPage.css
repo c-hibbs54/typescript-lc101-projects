@@ -1,0 +1,47 @@
+.progress-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.progress-page__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progress-page__row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+}
+
+.progress-page__letter {
+  font-size: 1.4rem;
+  font-weight: 800;
+  width: 2ch;
+}
+
+.progress-page__row-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.progress-page__danger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-color: var(--color-danger);
+}
+
+.progress-page__confirm {
+  display: flex;
+  gap: 0.5rem;
+}

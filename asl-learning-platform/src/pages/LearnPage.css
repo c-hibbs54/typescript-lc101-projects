@@ -1,0 +1,19 @@
+.learn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.learn__unit {
+  margin-bottom: 1rem;
+}
+
+.learn__unit-description {
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.learn__detail {
+  position: sticky;
+  bottom: 1rem;
+}

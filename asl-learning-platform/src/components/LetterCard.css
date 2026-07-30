@@ -1,0 +1,50 @@
+.letter-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--color-border);
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+
+.letter-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.letter-card--selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+.letter-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.letter-card__glyph {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.letter-card__description {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  min-height: 3.2em;
+}
+
+.letter-card__tip {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.letter-card__footer {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
