@@ -2,7 +2,11 @@ name: Deploy SignLoop to GitHub Pages
 
 on:
   push:
-    branches: [master]
+    # TODO: drop the feature branch below once this workflow has run once
+    # from master - it's here only so the very first deploy doesn't have to
+    # wait for a merge (workflow_dispatch can't target a workflow that has
+    # never existed on the default branch yet).
+    branches: [master, claude/asl-learning-gesture-recognition-6efoug]
     paths:
       - 'asl-learning-platform/**'
       - '.github/workflows/deploy-signloop.yml'
