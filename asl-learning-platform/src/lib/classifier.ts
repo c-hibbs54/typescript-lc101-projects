@@ -48,10 +48,17 @@ function distance(a: Point3D, b: Point3D): number {
   return magnitude(subtract(a, b))
 }
 
+/** Points "up" in normalized image coordinates (y increases downward). */
+const UP: Vec3 = { x: 0, y: -1, z: 0 }
+
 /**
- * Angle, in degrees [0, 180], between two vectors. Rotation-invariant by
- * construction: it only depends on the vectors' relative directions, never
- * on the hand's absolute orientation to the camera.
+ * Angle, in degrees [0, 180], between two vectors. When both vectors are
+ * derived purely from the hand's own joints (as in {@link computeCurl}) this
+ * is rotation-invariant, since it only depends on the vectors' relative
+ * directions, never the hand's absolute orientation to the camera. Comparing
+ * against a fixed external reference (like {@link UP} below) deliberately
+ * breaks that invariance to measure absolute orientation instead - see
+ * `handOrientation` in {@link getFeatureVector}.
  */
 function angleBetweenDeg(v1: Vec3, v2: Vec3): number {
   const denom = magnitude(v1) * magnitude(v2)
@@ -113,12 +120,25 @@ export const FEATURE_NAMES = [
   'indexMiddleSpread',
   'middleRingSpread',
   'ringPinkySpread',
+  'handOrientation',
 ] as const
 
 const FEATURE_COUNT = FEATURE_NAMES.length
 
 /**
- * Builds the rotation/scale-invariant feature vector used for classification.
+ * Builds the feature vector used for classification: mostly rotation/scale
+ * invariant (finger curls + palm-normalized distances), plus one deliberately
+ * NOT rotation-invariant feature, `handOrientation`.
+ *
+ * That last feature exists because a handful of letter pairs in the American
+ * Manual Alphabet share the exact same relative finger configuration and
+ * differ only by how the whole hand is rotated in space - G/Q (sideways vs.
+ * pointing down), H/U (sideways vs. pointing up), and K/P (pointing up vs.
+ * down). A purely rotation-invariant feature set can never tell these apart
+ * (that's the whole point of rotation invariance), so `handOrientation`
+ * captures the absolute angle of the wrist -> middle-MCP vector relative to
+ * "up" in the camera image, normalized to [0, 1] (0 = pointing up, 0.5 =
+ * sideways, 1 = pointing down).
  *
  * Distances are normalized by `palmSize` (wrist -> middle-MCP), so the
  * result is stable regardless of how close the hand is to the camera.
@@ -151,6 +171,11 @@ export function getFeatureVector(landmarks: HandLandmarks): number[] {
   const middleRingSpread = distance(landmarks[MIDDLE_TIP], landmarks[RING_TIP]) / palmSize
   const ringPinkySpread = distance(landmarks[RING_TIP], landmarks[PINKY_TIP]) / palmSize
 
+  // Absolute hand orientation (NOT rotation-invariant, intentionally - see
+  // the doc comment above). angleBetweenDeg returns [0, 180]; normalize to
+  // [0, 1] so it's on a comparable scale to the other features.
+  const handOrientation = angleBetweenDeg(subtract(middleMcp, wrist), UP) / 180
+
   return [
     thumbCurl,
     indexCurl,
@@ -162,6 +187,7 @@ export function getFeatureVector(landmarks: HandLandmarks): number[] {
     indexMiddleSpread,
     middleRingSpread,
     ringPinkySpread,
+    handOrientation,
   ]
 }
 
@@ -175,55 +201,64 @@ export function getFeatureVector(landmarks: HandLandmarks): number[] {
 // real sensor data.
 // ---------------------------------------------------------------------------
 
+// handOrientation reference values (11th feature, see getFeatureVector):
+// ~0.08 for a naturally-held upright hand (the default below), ~0.5 for the
+// sideways-tipped pair (G, H), ~0.94 for the pointing-down pair (Q, P). K and
+// U keep the upright default since they're the "pointing up" half of their
+// respective orientation-twin pairs.
+const ORIENTATION_UPRIGHT = 0.08
+const ORIENTATION_SIDEWAYS = 0.5
+const ORIENTATION_DOWN = 0.94
+
 export const LETTER_PROTOTYPES: Record<string, number[]> = {
   // Fist, thumb resting alongside the curled index finger (not across).
-  A: [0.2, 0.9, 0.9, 0.9, 0.9, 0.3, 0.9, 0.15, 0.15, 0.15],
+  A: [0.2, 0.9, 0.9, 0.9, 0.9, 0.3, 0.9, 0.15, 0.15, 0.15, ORIENTATION_UPRIGHT],
   // Flat hand, four fingers extended and together, thumb folded across palm.
-  B: [0.75, 0.05, 0.05, 0.05, 0.05, 0.5, 0.55, 0.12, 0.12, 0.12],
+  B: [0.75, 0.05, 0.05, 0.05, 0.05, 0.5, 0.55, 0.12, 0.12, 0.12, ORIENTATION_UPRIGHT],
   // Curved "C" - fingers and thumb both partially curled.
-  C: [0.4, 0.45, 0.45, 0.45, 0.45, 0.5, 0.6, 0.2, 0.2, 0.2],
+  C: [0.4, 0.45, 0.45, 0.45, 0.45, 0.5, 0.6, 0.2, 0.2, 0.2, ORIENTATION_UPRIGHT],
   // Index straight up, other three curled with tips near thumb.
-  D: [0.5, 0.05, 0.85, 0.85, 0.85, 0.35, 0.6, 0.4, 0.12, 0.12],
+  D: [0.5, 0.05, 0.85, 0.85, 0.85, 0.35, 0.6, 0.4, 0.12, 0.12, ORIENTATION_UPRIGHT],
   // Fingers curled down close together, thumb tucked under the fingertips.
-  E: [0.7, 0.8, 0.8, 0.8, 0.8, 0.4, 0.5, 0.1, 0.1, 0.1],
+  E: [0.7, 0.8, 0.8, 0.8, 0.8, 0.4, 0.5, 0.1, 0.1, 0.1, ORIENTATION_UPRIGHT],
   // Index and thumb touching (circle), middle/ring/pinky straight & together.
-  F: [0.55, 0.55, 0.05, 0.05, 0.05, 0.2, 0.55, 0.35, 0.15, 0.15],
-  // Index and thumb extended sideways, other three curled.
-  G: [0.2, 0.1, 0.85, 0.85, 0.85, 0.3, 0.8, 0.4, 0.12, 0.12],
-  // Index and middle extended together (sideways), ring/pinky curled.
-  H: [0.4, 0.1, 0.1, 0.85, 0.85, 0.45, 0.65, 0.12, 0.4, 0.12],
+  F: [0.55, 0.55, 0.05, 0.05, 0.05, 0.2, 0.55, 0.35, 0.15, 0.15, ORIENTATION_UPRIGHT],
+  // Index and thumb extended sideways, other three curled. Orientation-twin of Q.
+  G: [0.2, 0.1, 0.85, 0.85, 0.85, 0.3, 0.8, 0.4, 0.12, 0.12, ORIENTATION_SIDEWAYS],
+  // Index and middle extended together (sideways), ring/pinky curled. Orientation-twin of U.
+  H: [0.4, 0.1, 0.1, 0.85, 0.85, 0.45, 0.65, 0.12, 0.4, 0.12, ORIENTATION_SIDEWAYS],
   // Pinky only extended, thumb tucked across, rest curled.
-  I: [0.6, 0.85, 0.85, 0.85, 0.05, 0.4, 0.55, 0.1, 0.1, 0.6],
-  // Index and middle extended & spread, thumb extended up between them.
-  K: [0.25, 0.1, 0.1, 0.85, 0.85, 0.3, 0.6, 0.4, 0.35, 0.15],
+  I: [0.6, 0.85, 0.85, 0.85, 0.05, 0.4, 0.55, 0.1, 0.1, 0.6, ORIENTATION_UPRIGHT],
+  // Index and middle extended & spread, thumb extended up between them. Orientation-twin of P.
+  K: [0.25, 0.1, 0.1, 0.85, 0.85, 0.3, 0.6, 0.4, 0.35, 0.15, ORIENTATION_UPRIGHT],
   // Thumb and index extended at a right angle, other three curled.
-  L: [0.1, 0.05, 0.85, 0.85, 0.85, 0.6, 0.9, 0.45, 0.1, 0.1],
-  // Fist, thumb tucked under index/middle/ring.
-  M: [0.75, 0.9, 0.9, 0.9, 0.9, 0.6, 0.5, 0.1, 0.1, 0.1],
-  // Fist, thumb tucked under index/middle only.
-  N: [0.72, 0.9, 0.9, 0.9, 0.9, 0.5, 0.65, 0.1, 0.1, 0.1],
+  L: [0.1, 0.05, 0.85, 0.85, 0.85, 0.6, 0.9, 0.45, 0.1, 0.1, ORIENTATION_UPRIGHT],
+  // Fist, thumb tucked deepest - under index/middle/ring, tip toward the pinky side.
+  M: [0.78, 0.9, 0.9, 0.9, 0.9, 0.55, 0.48, 0.1, 0.1, 0.1, ORIENTATION_UPRIGHT],
+  // Fist, thumb tucked under index/middle only - shallower than M, tip more central.
+  N: [0.68, 0.9, 0.9, 0.9, 0.9, 0.42, 0.6, 0.1, 0.1, 0.1, ORIENTATION_UPRIGHT],
   // Rounded "O" - all fingertips curl in to meet the thumb.
-  O: [0.55, 0.6, 0.6, 0.6, 0.6, 0.25, 0.55, 0.15, 0.15, 0.15],
-  // Like K but pointing down (index/middle spread, thumb between them).
-  P: [0.25, 0.12, 0.12, 0.85, 0.85, 0.32, 0.58, 0.38, 0.32, 0.15],
-  // Like G but pointing down.
-  Q: [0.22, 0.12, 0.85, 0.85, 0.85, 0.32, 0.78, 0.42, 0.12, 0.12],
+  O: [0.55, 0.6, 0.6, 0.6, 0.6, 0.25, 0.55, 0.15, 0.15, 0.15, ORIENTATION_UPRIGHT],
+  // Like K but pointing down (index/middle spread, thumb between them). Orientation-twin of K.
+  P: [0.25, 0.12, 0.12, 0.85, 0.85, 0.32, 0.58, 0.38, 0.32, 0.15, ORIENTATION_DOWN],
+  // Like G but pointing down. Orientation-twin of G.
+  Q: [0.22, 0.12, 0.85, 0.85, 0.85, 0.32, 0.78, 0.42, 0.12, 0.12, ORIENTATION_DOWN],
   // Index and middle crossed, ring/pinky curled, thumb across.
-  R: [0.45, 0.15, 0.15, 0.85, 0.85, 0.45, 0.55, 0.05, 0.35, 0.12],
-  // Fist, thumb wrapped across the front of the fingers.
-  S: [0.65, 0.9, 0.9, 0.9, 0.9, 0.5, 0.65, 0.1, 0.1, 0.1],
-  // Fist, thumb tip poking between index and middle.
-  T: [0.6, 0.88, 0.88, 0.88, 0.88, 0.35, 0.65, 0.1, 0.1, 0.1],
-  // Index and middle extended together (upright), ring/pinky curled.
-  U: [0.4, 0.1, 0.1, 0.85, 0.85, 0.45, 0.6, 0.12, 0.4, 0.12],
+  R: [0.45, 0.15, 0.15, 0.85, 0.85, 0.45, 0.55, 0.05, 0.35, 0.12, ORIENTATION_UPRIGHT],
+  // Fist, thumb wrapped across the FRONT of the curled fingers (not tucked underneath like M/N).
+  S: [0.58, 0.9, 0.9, 0.9, 0.9, 0.46, 0.55, 0.1, 0.1, 0.1, ORIENTATION_UPRIGHT],
+  // Fist, thumb tip poking OUT between index and middle - least curled/most visible of the four.
+  T: [0.45, 0.88, 0.88, 0.88, 0.88, 0.3, 0.7, 0.1, 0.1, 0.1, ORIENTATION_UPRIGHT],
+  // Index and middle extended together (upright), ring/pinky curled. Orientation-twin of H.
+  U: [0.4, 0.1, 0.1, 0.85, 0.85, 0.45, 0.6, 0.12, 0.4, 0.12, ORIENTATION_UPRIGHT],
   // Index and middle extended & spread ("peace"), ring/pinky curled.
-  V: [0.5, 0.1, 0.1, 0.85, 0.85, 0.45, 0.55, 0.6, 0.55, 0.15],
+  V: [0.5, 0.1, 0.1, 0.85, 0.85, 0.45, 0.55, 0.6, 0.55, 0.15, ORIENTATION_UPRIGHT],
   // Index, middle, ring extended & spread, pinky curled, thumb near pinky.
-  W: [0.55, 0.08, 0.08, 0.1, 0.85, 0.7, 0.25, 0.45, 0.45, 0.35],
+  W: [0.55, 0.08, 0.08, 0.1, 0.85, 0.7, 0.25, 0.45, 0.45, 0.35, ORIENTATION_UPRIGHT],
   // Index hooked (partial curl), rest curled into fist, thumb alongside.
-  X: [0.25, 0.5, 0.9, 0.9, 0.9, 0.3, 0.85, 0.12, 0.12, 0.12],
+  X: [0.25, 0.5, 0.9, 0.9, 0.9, 0.3, 0.85, 0.12, 0.12, 0.12, ORIENTATION_UPRIGHT],
   // Thumb and pinky extended ("hang loose"), other three curled.
-  Y: [0.1, 0.85, 0.85, 0.85, 0.05, 0.6, 0.85, 0.1, 0.1, 0.6],
+  Y: [0.1, 0.85, 0.85, 0.85, 0.05, 0.6, 0.85, 0.1, 0.1, 0.6, ORIENTATION_UPRIGHT],
 }
 
 // ---------------------------------------------------------------------------

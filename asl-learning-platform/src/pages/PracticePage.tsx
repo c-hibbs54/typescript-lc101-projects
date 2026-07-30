@@ -1,15 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
-import { ALL_SIGNS, getSignById } from '../data/curriculum'
+import { getSignById, RECOGNIZABLE_SIGNS } from '../data/curriculum'
 import { classifyHandShape } from '../lib/classifier'
 import { WebcamPanel } from '../components/WebcamPanel'
 import { ProgressBar } from '../components/ProgressBar'
+import { CandidateList } from '../components/CandidateList'
 import { useProgress } from '../context/ProgressContext'
 import { useSustainedMatch } from '../hooks/useSustainedMatch'
 import type { ClassificationResult, HandDetectionResult, ProgressState } from '../types/asl'
 import '../styles/shared-practice.css'
 import './PracticePage.css'
-
-const RECOGNIZABLE_SIGNS = ALL_SIGNS.filter((sign) => sign.recognizable)
 
 function buildQueue(progress: ProgressState): string[] {
   const weighted = RECOGNIZABLE_SIGNS.map((sign) => {
@@ -45,8 +44,7 @@ export function PracticePage() {
       }
       return next
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queue.length])
+  }, [queue.length, progress])
 
   const handleConfirmed = useCallback(() => {
     if (!targetId) return
@@ -103,17 +101,7 @@ export function PracticePage() {
             <p>Loading a letter to practice…</p>
           )}
 
-          <div className="practice__candidates">
-            <h4>Live guesses</h4>
-            {topCandidates.length === 0 && <p className="practice__no-hand">Show your hand to the camera.</p>}
-            {topCandidates.map((c) => (
-              <div key={c.letter} className="practice__candidate-row">
-                <span>{c.letter}</span>
-                <ProgressBar value={c.confidence} max={1} />
-                <span className="practice__candidate-pct">{Math.round(c.confidence * 100)}%</span>
-              </div>
-            ))}
-          </div>
+          <CandidateList candidates={topCandidates} />
         </div>
       </div>
     </div>

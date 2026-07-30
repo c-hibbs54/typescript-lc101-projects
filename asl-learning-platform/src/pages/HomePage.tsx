@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom'
-import { ALL_SIGNS, PLATFORM_DISCLAIMER } from '../data/curriculum'
+import { PLATFORM_DISCLAIMER, RECOGNIZABLE_SIGNS } from '../data/curriculum'
 import { useProgress } from '../context/ProgressContext'
 import './HomePage.css'
 
 export function HomePage() {
   const { progress } = useProgress()
-  const recognizableSigns = ALL_SIGNS.filter((sign) => sign.recognizable)
-  const masteredCount = recognizableSigns.filter((sign) => progress.letters[sign.id]?.mastered).length
+  const masteredCount = RECOGNIZABLE_SIGNS.filter((sign) => progress.letters[sign.id]?.mastered).length
 
   return (
     <div className="home">
@@ -29,7 +28,7 @@ export function HomePage() {
       <section className="grid stat-grid">
         <div className="card stat-card">
           <span className="stat-card__value">
-            {masteredCount}/{recognizableSigns.length}
+            {masteredCount}/{RECOGNIZABLE_SIGNS.length}
           </span>
           <span className="stat-card__label">letters mastered</span>
         </div>

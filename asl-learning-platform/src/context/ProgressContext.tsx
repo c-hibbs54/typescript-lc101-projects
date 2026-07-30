@@ -27,15 +27,24 @@ function loadState(): ProgressState {
   }
 }
 
+/** Formats a date as the user's local calendar day (not UTC), e.g. "2026-07-30". */
+function localDateKey(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10)
+  return localDateKey(new Date())
 }
 
 function bumpStreak(state: ProgressState): ProgressState {
   const today = todayKey()
   if (state.lastActiveDate === today) return state
-  const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10)
-  const streakDays = state.lastActiveDate === yesterday ? state.streakDays + 1 : 1
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const streakDays = state.lastActiveDate === localDateKey(yesterday) ? state.streakDays + 1 : 1
   return { ...state, lastActiveDate: today, streakDays }
 }
 

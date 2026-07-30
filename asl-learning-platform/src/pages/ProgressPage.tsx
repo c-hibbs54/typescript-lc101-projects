@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ALL_SIGNS } from '../data/curriculum'
+import { RECOGNIZABLE_SIGNS } from '../data/curriculum'
 import { ProgressBar } from '../components/ProgressBar'
 import { useProgress } from '../context/ProgressContext'
 import './ProgressPage.css'
@@ -8,9 +8,8 @@ export function ProgressPage() {
   const { progress, resetProgress } = useProgress()
   const [confirmingReset, setConfirmingReset] = useState(false)
 
-  const recognizable = ALL_SIGNS.filter((sign) => sign.recognizable)
-  const masteredCount = recognizable.filter((sign) => progress.letters[sign.id]?.mastered).length
-  const practicedRows = recognizable
+  const masteredCount = RECOGNIZABLE_SIGNS.filter((sign) => progress.letters[sign.id]?.mastered).length
+  const practicedRows = RECOGNIZABLE_SIGNS
     .map((sign) => ({ sign, stats: progress.letters[sign.id] }))
     .filter((row) => row.stats)
     .sort((a, b) => (b.stats?.lastPracticedAt ?? 0) - (a.stats?.lastPracticedAt ?? 0))
@@ -27,7 +26,7 @@ export function ProgressPage() {
       <section className="grid stat-grid">
         <div className="card stat-card">
           <span className="stat-card__value">
-            {masteredCount}/{recognizable.length}
+            {masteredCount}/{RECOGNIZABLE_SIGNS.length}
           </span>
           <span className="stat-card__label">letters mastered</span>
         </div>
@@ -47,7 +46,7 @@ export function ProgressPage() {
 
       <section>
         <h2>Overall mastery</h2>
-        <ProgressBar value={masteredCount} max={recognizable.length} />
+        <ProgressBar value={masteredCount} max={RECOGNIZABLE_SIGNS.length} />
       </section>
 
       <section>

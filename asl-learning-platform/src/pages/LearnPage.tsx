@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CURRICULUM_UNITS, getSignById } from '../data/curriculum'
+import { CURRICULUM_UNITS, getSignById, PRACTICE_WORDS } from '../data/curriculum'
 import { LetterCard } from '../components/LetterCard'
 import { useProgress } from '../context/ProgressContext'
 import type { AslSignLesson } from '../types/asl'
@@ -38,6 +38,22 @@ export function LearnPage() {
           </div>
         </section>
       ))}
+
+      <section className="learn__unit">
+        <h2>Bonus: words to spell</h2>
+        <p className="learn__unit-description">
+          Once the alphabet feels comfortable, practice fingerspelling these words letter by letter — read the
+          hint, then spell out the word (on your own, or letter-by-letter in Practice mode).
+        </p>
+        <ul className="learn__word-list">
+          {PRACTICE_WORDS.map((w) => (
+            <li key={w.word} className="learn__word-item card">
+              <span className="learn__word">{w.word}</span>
+              <span className="learn__word-hint">{w.hint}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {selected && (
         <div className="learn__detail card">

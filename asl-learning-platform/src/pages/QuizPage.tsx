@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ALL_SIGNS, getSignById } from '../data/curriculum'
+import { getSignById, RECOGNIZABLE_SIGNS } from '../data/curriculum'
 import { classifyHandShape } from '../lib/classifier'
 import { WebcamPanel } from '../components/WebcamPanel'
 import { ProgressBar } from '../components/ProgressBar'
+import { CandidateList } from '../components/CandidateList'
 import { useProgress } from '../context/ProgressContext'
 import { useSustainedMatch } from '../hooks/useSustainedMatch'
 import type { ClassificationResult, HandDetectionResult } from '../types/asl'
 import '../styles/shared-practice.css'
 import './QuizPage.css'
 
-const RECOGNIZABLE_SIGNS = ALL_SIGNS.filter((sign) => sign.recognizable)
 const QUESTION_COUNT = 10
 const QUESTION_DURATION_MS = 8000
 
@@ -151,17 +151,7 @@ export function QuizPage() {
             </>
           )}
 
-          <div className="practice__candidates">
-            <h4>Live guesses</h4>
-            {topCandidates.length === 0 && <p className="practice__no-hand">Show your hand to the camera.</p>}
-            {topCandidates.map((c) => (
-              <div key={c.letter} className="practice__candidate-row">
-                <span>{c.letter}</span>
-                <ProgressBar value={c.confidence} max={1} />
-                <span className="practice__candidate-pct">{Math.round(c.confidence * 100)}%</span>
-              </div>
-            ))}
-          </div>
+          <CandidateList candidates={topCandidates} />
         </div>
       </div>
     </div>

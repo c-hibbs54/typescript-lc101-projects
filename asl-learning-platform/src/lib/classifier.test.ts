@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { HandLandmarks, Point3D } from '../types/asl'
-import { classifyHandShape, computeCurl, getFeatureVector, LETTER_PROTOTYPES } from './classifier'
+import { classifyHandShape, computeCurl, FEATURE_NAMES, getFeatureVector, LETTER_PROTOTYPES } from './classifier'
 
 // ---------------------------------------------------------------------------
 // Synthetic landmark fixture builders.
@@ -165,6 +165,44 @@ describe('LETTER_PROTOTYPES', () => {
     for (const [letter, prototype] of Object.entries(LETTER_PROTOTYPES)) {
       expect(prototype, `prototype for ${letter}`).toHaveLength(featureLength)
     }
+  })
+
+  function protoDistance(a: string, b: string): number {
+    const pa = LETTER_PROTOTYPES[a]
+    const pb = LETTER_PROTOTYPES[b]
+    let sum = 0
+    for (let i = 0; i < pa.length; i++) sum += (pa[i] - pb[i]) ** 2
+    return Math.sqrt(sum)
+  }
+
+  // Regression guard: these letter pairs look identical to a purely
+  // rotation-invariant feature set (G/Q, H/U, K/P are the same handshape
+  // rotated; M/N/S/T are all near-fist shapes differing only in thumb
+  // position) and have previously been hand-tuned prototypes that were
+  // accidentally almost numerically identical, making them unrecognizable as
+  // distinct letters in practice. This doesn't assert they're easy to tell
+  // apart (some, like N/S, are genuinely subtle) - just that they're not
+  // copy-paste duplicates in disguise.
+  it.each([
+    ['G', 'Q'],
+    ['H', 'U'],
+    ['K', 'P'],
+    ['M', 'N'],
+    ['M', 'S'],
+    ['M', 'T'],
+    ['N', 'S'],
+    ['N', 'T'],
+    ['S', 'T'],
+  ])('%s and %s prototypes are meaningfully separated', (a, b) => {
+    expect(protoDistance(a, b)).toBeGreaterThan(0.09)
+  })
+})
+
+describe('FEATURE_NAMES', () => {
+  it('stays in sync with the actual length of getFeatureVector output', () => {
+    // Guards against FEATURE_NAMES silently drifting out of alignment if
+    // getFeatureVector's dimensions are ever added to/reordered/removed.
+    expect(FEATURE_NAMES).toHaveLength(getFeatureVector(handA).length)
   })
 })
 

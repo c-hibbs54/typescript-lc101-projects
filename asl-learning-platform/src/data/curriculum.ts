@@ -294,6 +294,9 @@ export const WORD_SIGNS: AslSignLesson[] = [
 
 export const ALL_SIGNS: AslSignLesson[] = [...ASL_ALPHABET, ...WORD_SIGNS]
 
+/** Signs the live webcam classifier can currently attempt to recognize (Practice/Quiz draw from this pool). */
+export const RECOGNIZABLE_SIGNS: AslSignLesson[] = ALL_SIGNS.filter((sign) => sign.recognizable)
+
 export const CURRICULUM_UNITS: CurriculumUnit[] = [
   {
     id: 'unit-1-easy',
