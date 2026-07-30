@@ -47,7 +47,12 @@ jobs:
       # the client-side router take over and render the right route.
       - run: cp dist/index.html dist/404.html
 
+      # enablement: true lets this workflow turn Pages on itself (via the
+      # pages:write permission above) the first time it runs, instead of
+      # requiring a manual Settings -> Pages -> Source: GitHub Actions click.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
