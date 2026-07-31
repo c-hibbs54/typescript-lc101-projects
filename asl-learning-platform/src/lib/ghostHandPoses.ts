@@ -103,6 +103,9 @@ interface FingerGeometry {
   splayDeg: number
   len1: number
   len2: number
+  /** Silhouette width at the knuckle and at the tip, in viewBox units. */
+  widthBase: number
+  widthTip: number
 }
 
 /** A point in the hand's local drawing space. */
@@ -111,18 +114,150 @@ export interface Point2D {
   y: number
 }
 
+// ---------------------------------------------------------------------------
+// Tapered digit geometry
+// ---------------------------------------------------------------------------
+
+function quadAt(p0: Point2D, p1: Point2D, p2: Point2D, t: number): Point2D {
+  const mt = 1 - t
+  return {
+    x: mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x,
+    y: mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y,
+  }
+}
+
+/** Derivative of the quadratic, i.e. the direction the digit runs at `t`. */
+function quadTangent(p0: Point2D, p1: Point2D, p2: Point2D, t: number): Point2D {
+  return {
+    x: 2 * (1 - t) * (p1.x - p0.x) + 2 * t * (p2.x - p1.x),
+    y: 2 * (1 - t) * (p1.y - p0.y) + 2 * t * (p2.y - p1.y),
+  }
+}
+
+/** Unit normal (perpendicular) to the curve at `t`. */
+function quadNormal(p0: Point2D, p1: Point2D, p2: Point2D, t: number): Point2D {
+  const d = quadTangent(p0, p1, p2, t)
+  const len = Math.hypot(d.x, d.y) || 1
+  return { x: -d.y / len, y: d.x / len }
+}
+
+const TAPER_SAMPLES = 12
+
+/** Formats a point for a path command. */
+function fmtPoint(p: Point2D): string {
+  return `${p.x.toFixed(1)},${p.y.toFixed(1)}`
+}
+
+/**
+ * Closed silhouette of a digit that tapers from `widthBase` at the knuckle to
+ * `widthTip` at the fingertip, following the base->bend->tip quadratic and
+ * capped with a round end.
+ *
+ * Built by walking the curve, offsetting perpendicular by the half-width at
+ * each step, then joining the two sides with an arc across the tip.
+ */
+export function taperedOutline(
+  base: Point2D,
+  bend: Point2D,
+  tip: Point2D,
+  widthBase: number,
+  widthTip: number,
+): string {
+  const left: Point2D[] = []
+  const right: Point2D[] = []
+
+  for (let i = 0; i <= TAPER_SAMPLES; i++) {
+    const t = i / TAPER_SAMPLES
+    const point = quadAt(base, bend, tip, t)
+    const normal = quadNormal(base, bend, tip, t)
+    // Slight bulge just past the knuckle, like a real proximal phalanx.
+    const bulge = 1 + 0.06 * Math.sin(Math.PI * Math.min(1, t * 1.6))
+    const half = ((widthBase + (widthTip - widthBase) * t) * bulge) / 2
+    left.push({ x: point.x + normal.x * half, y: point.y + normal.y * half })
+    right.push({ x: point.x - normal.x * half, y: point.y - normal.y * half })
+  }
+
+  const forward = left.map((p, i) => (i === 0 ? `M ${fmtPoint(p)}` : `L ${fmtPoint(p)}`)).join(' ')
+
+  // Round the fingertip with a quadratic bulging just past the tip. An arc
+  // whose diameter exactly equals its chord (radius = widthTip/2 across a
+  // widthTip-wide tip) is numerically borderline and rendered as a notch.
+  const endTangent = quadTangent(base, bend, tip, 1)
+  const elen = Math.hypot(endTangent.x, endTangent.y) || 1
+  const apex = {
+    x: tip.x + (endTangent.x / elen) * widthTip * 0.92,
+    y: tip.y + (endTangent.y / elen) * widthTip * 0.92,
+  }
+  const cap = `Q ${fmtPoint(apex)} ${fmtPoint(right[right.length - 1])}`
+  const back = right
+    .slice(0, -1)
+    .reverse()
+    .map((p) => `L ${fmtPoint(p)}`)
+    .join(' ')
+
+  return `${forward} ${cap} ${back} Z`
+}
+
+/**
+ * Fingernail plate: a small rounded quad sitting just short of the tip, on the
+ * back of the digit. The reference sheet shows these as its lightest accent, and
+ * they do a lot of work in reading a shape as a hand rather than a tube.
+ */
+export function nailPath(
+  base: Point2D,
+  bend: Point2D,
+  tip: Point2D,
+  widthTip: number,
+): string {
+  const centre = quadAt(base, bend, tip, 0.87)
+  const normal = quadNormal(base, bend, tip, 0.87)
+  const tangent = quadTangent(base, bend, tip, 0.87)
+  const tlen = Math.hypot(tangent.x, tangent.y) || 1
+  const along = { x: tangent.x / tlen, y: tangent.y / tlen }
+
+  const halfW = widthTip * 0.29
+  const halfL = widthTip * 0.4
+
+  // Four corners of the nail bed, in the digit's own along/across frame.
+  const a = { x: centre.x - along.x * halfL - normal.x * halfW, y: centre.y - along.y * halfL - normal.y * halfW }
+  const b = { x: centre.x + along.x * halfL - normal.x * halfW, y: centre.y + along.y * halfL - normal.y * halfW }
+  const c = { x: centre.x + along.x * halfL + normal.x * halfW, y: centre.y + along.y * halfL + normal.y * halfW }
+  const d = { x: centre.x - along.x * halfL + normal.x * halfW, y: centre.y - along.y * halfL + normal.y * halfW }
+
+  // Smooth rounded quad: run through edge midpoints, using each corner as the
+  // control point. A straight-edged path here left a visible notch at the tip.
+  const mid = (p: Point2D, q: Point2D): Point2D => ({ x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 })
+  return (
+    `M ${fmtPoint(mid(a, b))} Q ${fmtPoint(b)} ${fmtPoint(mid(b, c))} ` +
+    `Q ${fmtPoint(c)} ${fmtPoint(mid(c, d))} ` +
+    `Q ${fmtPoint(d)} ${fmtPoint(mid(d, a))} ` +
+    `Q ${fmtPoint(a)} ${fmtPoint(mid(a, b))} Z`
+  )
+}
+
 /**
  * One digit's centre-line, plus the two endpoints the illustration needs to
  * run a gradient along it: purple where it leaves the palm, green at the tip.
  */
 export interface Digit {
+  /** Centre-line, kept for bounds/rotation maths. */
   d: string
+  /**
+   * Closed, tapered silhouette of the digit - wider at the knuckle, narrower at
+   * the tip, with a rounded end. Stroking a uniform-width centre-line makes
+   * fingers read as sausages; real fingers taper, which is the single biggest
+   * thing separating the reference art from a stroked line.
+   */
+  outline: string
+  /** Fingernail plate near the tip, in the reference's lighter accent tone. */
+  nail: string
   base: Point2D
+  bend: Point2D
   tip: Point2D
 }
 
 /** A smooth quadratic path from base -> bend -> tip for one finger. */
-function fingerPath({ baseX, baseY, curl, splayDeg, len1, len2 }: FingerGeometry): Digit {
+function fingerPath({ baseX, baseY, curl, splayDeg, len1, len2, widthBase, widthTip }: FingerGeometry): Digit {
   const dir1 = splayDeg
   // Curled fingers foreshorten hard - a fist is compact, and without this the
   // tips arc out over the knuckles like a claw instead of folding in.
@@ -137,10 +272,24 @@ function fingerPath({ baseX, baseY, curl, splayDeg, len1, len2 }: FingerGeometry
   const tipX = bendX + l2 * Math.sin(rad2)
   const tipY = bendY - l2 * Math.cos(rad2)
 
+  return buildDigit({ x: baseX, y: baseY }, { x: bendX, y: bendY }, { x: tipX, y: tipY }, widthBase, widthTip)
+}
+
+/** Assembles the centre-line, tapered silhouette and nail for one digit. */
+function buildDigit(
+  base: Point2D,
+  bend: Point2D,
+  tip: Point2D,
+  widthBase: number,
+  widthTip: number,
+): Digit {
   return {
-    d: `M ${baseX.toFixed(1)},${baseY.toFixed(1)} Q ${bendX.toFixed(1)},${bendY.toFixed(1)} ${tipX.toFixed(1)},${tipY.toFixed(1)}`,
-    base: { x: baseX, y: baseY },
-    tip: { x: tipX, y: tipY },
+    d: `M ${fmtPoint(base)} Q ${fmtPoint(bend)} ${fmtPoint(tip)}`,
+    outline: taperedOutline(base, bend, tip, widthBase, widthTip),
+    nail: nailPath(base, bend, tip, widthTip),
+    base,
+    bend,
+    tip,
   }
 }
 
@@ -162,11 +311,7 @@ function thumbPath(baseX: number, baseY: number, curl: number, out: number): Dig
   const tipX = bendX + l2 * Math.sin(rad2)
   const tipY = bendY - l2 * Math.cos(rad2)
 
-  return {
-    d: `M ${baseX.toFixed(1)},${baseY.toFixed(1)} Q ${bendX.toFixed(1)},${bendY.toFixed(1)} ${tipX.toFixed(1)},${tipY.toFixed(1)}`,
-    base: { x: baseX, y: baseY },
-    tip: { x: tipX, y: tipY },
-  }
+  return buildDigit({ x: baseX, y: baseY }, { x: bendX, y: bendY }, { x: tipX, y: tipY }, 21, 15)
 }
 
 /**
@@ -222,10 +367,10 @@ export function buildHandPaths(pose: number[]): HandPaths {
     // Finger lengths are ~1.15x the palm's knuckle-to-heel span, matching real
     // proportions - a shorter finger set reads as a mitten rather than a hand.
     fingers: [
-      fingerPath({ baseX: 84, baseY: 103, curl: pinkyCurl, splayDeg: -18 - ringPinkySpread * 14, len1: 40, len2: 28 }),
-      fingerPath({ baseX: 101, baseY: 96, curl: ringCurl, splayDeg: -6 - middleRingSpread * 8, len1: 50, len2: 33 }),
-      fingerPath({ baseX: 118, baseY: 94, curl: middleCurl, splayDeg: 2, len1: 56, len2: 36 }),
-      fingerPath({ baseX: 135, baseY: 98, curl: indexCurl, splayDeg: 14 + indexMiddleSpread * 14, len1: 52, len2: 35 }),
+      fingerPath({ baseX: 84, baseY: 103, curl: pinkyCurl, splayDeg: -18 - ringPinkySpread * 14, len1: 40, len2: 28, widthBase: 14, widthTip: 10 }),
+      fingerPath({ baseX: 101, baseY: 96, curl: ringCurl, splayDeg: -6 - middleRingSpread * 8, len1: 50, len2: 33, widthBase: 16, widthTip: 11 }),
+      fingerPath({ baseX: 118, baseY: 94, curl: middleCurl, splayDeg: 2, len1: 56, len2: 36, widthBase: 17, widthTip: 12 }),
+      fingerPath({ baseX: 135, baseY: 98, curl: indexCurl, splayDeg: 14 + indexMiddleSpread * 14, len1: 52, len2: 35, widthBase: 16, widthTip: 11 }),
     ],
     // Anchored inside the palm silhouette, not on its edge: the thumb is drawn
     // behind the palm so this root tucks under it and reads as attached.

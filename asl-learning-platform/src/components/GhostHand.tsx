@@ -11,13 +11,14 @@ import './GhostHand.css'
  * The gradient is per-digit and in the hand's own coordinate space, so a curled
  * finger still has a green tip and the whole thing rotates with the hand.
  */
-function DigitPath({ digit, gradientId, wide }: { digit: Digit; gradientId: string; wide?: boolean }) {
-  const cls = wide ? ' ghost-hand__digit--thumb' : ''
+function DigitPath({ digit, gradientId }: { digit: Digit; gradientId: string }) {
   return (
     <>
-      <path className={`ghost-hand__digit-line${cls}`} d={digit.d} />
-      <path className={`ghost-hand__digit${cls}`} d={digit.d} stroke={`url(#${gradientId})`} />
-      <path className={`ghost-hand__digit-sheen${cls}`} d={digit.d} />
+      {/* Tapered silhouette: dark linework, then the violet->green body fill. */}
+      <path className="ghost-hand__digit-line" d={digit.outline} />
+      <path className="ghost-hand__digit" d={digit.outline} fill={`url(#${gradientId})`} />
+      {/* Nail plate, the lightest accent - reads strongly as a fingertip. */}
+      <path className="ghost-hand__nail" d={digit.nail} />
     </>
   )
 }
@@ -58,12 +59,12 @@ function GhostHandLayer({ art, uid }: { art: GhostHandArt; uid: string }) {
       <g className="ghost-hand__glow">
         <path d={paths.palm} />
         {digits.map((digit, i) => (
-          <path key={i} d={digit.d} />
+          <path key={i} d={digit.outline} />
         ))}
       </g>
 
       {/* Thumb first, so the palm covers its root and it reads as attached. */}
-      <DigitPath digit={paths.thumb} gradientId={`${uid}-${role}-d${digits.length - 1}`} wide />
+      <DigitPath digit={paths.thumb} gradientId={`${uid}-${role}-d${digits.length - 1}`} />
 
       {/* Palm: linework, base fill, then the deep shadow tone in the hollow */}
       <path className="ghost-hand__palm-line" d={paths.palm} />

@@ -111,38 +111,24 @@
 
 /* --- Digits ------------------------------------------------------------- */
 
+/* Digits are filled tapered silhouettes, not stroked centre-lines: real fingers
+   narrow toward the tip, and a uniform stroke reads as a sausage. The linework
+   is the same path stroked underneath, so the outline follows the taper. */
 .ghost-hand__digit-line {
-  fill: none;
+  fill: var(--art-line);
   stroke: var(--art-line);
-  stroke-width: 23;
-  stroke-linecap: round;
+  stroke-width: 6;
   stroke-linejoin: round;
 }
 
 .ghost-hand__digit {
-  fill: none;
-  stroke-width: 15;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  stroke: none;
 }
 
-/* A thin lit edge along each digit, the cel-shading highlight pass. Kept low:
-   at higher opacity the white washes the violet out to grey. */
-.ghost-hand__digit-sheen {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  opacity: 0.13;
-  transform: translate(-3.5px, -2px);
-}
-
-.ghost-hand__digit-line--thumb {
-  stroke-width: 23;
-}
-
-.ghost-hand__digit--thumb {
-  stroke-width: 17;
+/* Fingernail: the lightest of the three tones. */
+.ghost-hand__nail {
+  fill: color-mix(in srgb, var(--tone-accent) 62%, #fff 38%);
+  opacity: 0.9;
 }
 
 @media (prefers-reduced-motion: reduce) {
