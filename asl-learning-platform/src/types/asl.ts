@@ -15,10 +15,31 @@ export type HandLandmarks = Point3D[]
 
 export type Handedness = 'Left' | 'Right'
 
+/** Which hand the learner signs with. Decides which detected hand is 'primary'. */
+export type DominantHand = Handedness
+
+/**
+ * Role a detected hand plays in a sign. The app renders these with a fixed
+ * colour convention everywhere (live overlay and reference illustrations):
+ * 'primary' (the main/dominant signing hand) is always violet, 'secondary'
+ * (the supporting hand) is always green.
+ */
+export type HandRole = 'primary' | 'secondary'
+
 export interface HandDetectionResult {
   landmarks: HandLandmarks
   handedness: Handedness
   handednessScore: number
+  timestampMs: number
+  role: HandRole
+}
+
+/** Every hand seen in one video frame, with roles already resolved. */
+export interface FrameDetection {
+  /** All detected hands, primary first. */
+  hands: HandDetectionResult[]
+  primary: HandDetectionResult | null
+  secondary: HandDetectionResult | null
   timestampMs: number
 }
 
@@ -76,6 +97,8 @@ export interface ProgressState {
   quizAttempts: number
   streakDays: number
   lastActiveDate: string | null
+  /** Hand the learner signs with; the one drawn violet as 'primary'. */
+  dominantHand: DominantHand
 }
 
 export const MASTERY_THRESHOLD = 5

@@ -1,47 +1,91 @@
 :root {
   color-scheme: light dark;
 
-  --color-bg: #f7f7fb;
+  --color-bg: #f5f1fb;
   --color-surface: #ffffff;
-  --color-surface-hover: #f0f0f8;
-  --color-border: #e3e3ee;
-  --color-text: #1a1a2e;
-  --color-text-muted: #5f5f78;
-  --color-accent: #5b4fe9;
-  --color-accent-strong: #4438d1;
-  --color-accent-soft: #ecebff;
-  --color-success: #16a34a;
-  --color-success-soft: #dcfce7;
+  --color-surface-hover: #f2ebfb;
+  --color-border: #e1d4f5;
+  --color-text: #1e1330;
+  --color-text-muted: #6b5c85;
+
+  /* Deep-violet / acid-green / warm-orange: the whole app's accent triad. */
+  --color-accent: #5b2a86;
+  --color-accent-strong: #431f66;
+  --color-accent-soft: #ece1fa;
+
+  --color-lime: #6fae0c;
+  --color-lime-strong: #52840a;
+  --color-lime-soft: #e8f6d2;
+  --color-lime-vivid: #9fe000;
+
+  --color-highlight: #e6650a;
+  --color-highlight-strong: #c2550a;
+  --color-highlight-soft: #fde9d7;
+  --color-highlight-vivid: #ff7a1a;
+
+  --color-success: var(--color-lime);
+  --color-success-soft: var(--color-lime-soft);
   --color-warning: #b45309;
   --color-warning-soft: #fef3c7;
   --color-danger: #dc2626;
   --color-danger-soft: #fee2e2;
 
+  /* Hand-role convention, used by both the live overlay and the ghost-hand
+     reference illustrations: the main/dominant signing hand is ALWAYS violet,
+     a supporting second hand is ALWAYS green. Single source of truth - don't
+     hardcode these two colours anywhere else. */
+  --hand-primary: #7c3aed;
+  --hand-primary-glow: #a855f7;
+  --hand-secondary: #4d9a0f;
+  --hand-secondary-glow: #7cc82a;
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
-  --shadow-sm: 0 1px 2px rgba(20, 20, 43, 0.06);
-  --shadow-md: 0 8px 24px rgba(20, 20, 43, 0.12);
+  --radius-xl: 22px;
+  --shadow-sm: 0 1px 2px rgba(30, 19, 48, 0.07);
+  --shadow-md: 0 8px 24px rgba(30, 19, 48, 0.14);
+  --shadow-channel: 0 2px 4px rgba(30, 19, 48, 0.08), 0 10px 24px rgba(91, 42, 134, 0.14);
+  --shadow-channel-hover: 0 4px 8px rgba(30, 19, 48, 0.1), 0 16px 32px rgba(91, 42, 134, 0.22);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #101018;
-    --color-surface: #181824;
-    --color-surface-hover: #21212f;
-    --color-border: #2b2b3a;
-    --color-text: #eeeef6;
-    --color-text-muted: #a3a3b8;
-    --color-accent: #8b7ffc;
-    --color-accent-strong: #a79bff;
-    --color-accent-soft: #262244;
-    --color-success: #4ade80;
-    --color-success-soft: #123a24;
+    --color-bg: #100a1c;
+    --color-surface: #1b1329;
+    --color-surface-hover: #251a38;
+    --color-border: #362548;
+    --color-text: #f1ecff;
+    --color-text-muted: #b6a8cf;
+
+    --color-accent: #b28aff;
+    --color-accent-strong: #cbb0ff;
+    --color-accent-soft: #2c2148;
+
+    --color-lime: #a9e34d;
+    --color-lime-strong: #c3ef7c;
+    --color-lime-soft: #23361a;
+    --color-lime-vivid: #b6ff2e;
+
+    --color-highlight: #ff9a44;
+    --color-highlight-strong: #ffb066;
+    --color-highlight-soft: #3a2410;
+    --color-highlight-vivid: #ff8a2e;
+
     --color-warning: #fbbf24;
     --color-warning-soft: #3a2c0c;
     --color-danger: #f87171;
     --color-danger-soft: #3a1414;
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+    /* Brighter on dark backgrounds; same violet-primary / green-secondary convention. */
+    --hand-primary: #a97bff;
+    --hand-primary-glow: #c4a2ff;
+    --hand-secondary: #8fd63a;
+    --hand-secondary-glow: #b6ff2e;
+
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-channel: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 26px rgba(178, 138, 255, 0.16);
+    --shadow-channel-hover: 0 4px 10px rgba(0, 0, 0, 0.35), 0 18px 36px rgba(178, 138, 255, 0.26);
   }
 }
 
@@ -58,7 +102,11 @@ body,
 body {
   margin: 0;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: var(--color-bg);
+  background:
+    radial-gradient(1200px 480px at 12% -10%, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent),
+    radial-gradient(900px 420px at 110% 0%, color-mix(in srgb, var(--color-lime-vivid) 8%, transparent), transparent),
+    var(--color-bg);
+  background-attachment: fixed;
   color: var(--color-text);
 }
 
@@ -94,6 +142,34 @@ a {
   padding: 1.5rem;
 }
 
+/* "Channel" tile: a Wii Menu-style glossy, softly-bouncing tile treatment,
+   layered on top of .card for anything meant to feel like a pickable tile
+   (stat tiles, feature tiles, letter cards) rather than a static panel. */
+.channel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-channel);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+}
+
+.channel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 42%);
+  pointer-events: none;
+}
+
+.channel:hover {
+  transform: translateY(-4px) scale(1.025);
+  box-shadow: var(--shadow-channel-hover);
+}
+
+.channel:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -119,12 +195,12 @@ a {
 }
 
 .btn--primary {
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
   color: #fff;
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: var(--color-accent-strong);
+  background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent-strong) 100%);
 }
 
 .btn--secondary {
@@ -239,6 +315,6 @@ a {
 
 .progress-track__fill {
   height: 100%;
-  background: var(--color-accent);
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-lime-vivid) 100%);
   transition: width 0.1s linear;
 }

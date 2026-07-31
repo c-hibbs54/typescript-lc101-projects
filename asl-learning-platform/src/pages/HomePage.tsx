@@ -12,7 +12,7 @@ export function HomePage() {
       <section className="home__hero">
         <h1>Learn ASL fingerspelling with your webcam</h1>
         <p>
-          SignLoop watches your hand shape through your webcam and tells you, in real time, how close you are
+          SignJutsu watches your hand shape through your webcam and tells you, in real time, how close you are
           to the correct handshape — all running privately in your browser. Nothing is ever uploaded.
         </p>
         <div className="home__cta">
@@ -26,37 +26,37 @@ export function HomePage() {
       </section>
 
       <section className="grid stat-grid">
-        <div className="card stat-card">
+        <div className="card channel stat-card">
           <span className="stat-card__value">
             {masteredCount}/{RECOGNIZABLE_SIGNS.length}
           </span>
           <span className="stat-card__label">letters mastered</span>
         </div>
-        <div className="card stat-card">
+        <div className="card channel stat-card">
           <span className="stat-card__value">{progress.streakDays}</span>
           <span className="stat-card__label">day streak</span>
         </div>
-        <div className="card stat-card">
+        <div className="card channel stat-card">
           <span className="stat-card__value">{progress.quizHighScore}</span>
           <span className="stat-card__label">quiz high score</span>
         </div>
       </section>
 
       <section className="grid home__features">
-        <div className="card">
+        <div className="card channel">
           <h3>🎥 Real-time feedback</h3>
           <p>
             A hand-tracking model finds 21 points on your hand every frame and compares your shape to the
             target letter, live.
           </p>
         </div>
-        <div className="card">
+        <div className="card channel">
           <h3>🔒 Runs entirely on your device</h3>
           <p>
             Your camera feed is processed locally in the browser — no video is ever sent to a server.
           </p>
         </div>
-        <div className="card">
+        <div className="card channel">
           <h3>📈 Track your progress</h3>
           <p>Practice mode and quiz mode both save your progress locally so you can see yourself improve.</p>
         </div>

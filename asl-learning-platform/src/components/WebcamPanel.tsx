@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { useHandLandmarker } from '../hooks/useHandLandmarker'
-import { drawHandSkeleton } from '../lib/drawHandSkeleton'
-import type { HandDetectionResult } from '../types/asl'
+import { drawHands } from '../lib/drawHandSkeleton'
+import { useProgress } from '../context/ProgressContext'
+import type { DominantHand, FrameDetection } from '../types/asl'
 import './WebcamPanel.css'
 
 interface WebcamPanelProps {
   enabled: boolean
-  onDetection?: (detection: HandDetectionResult | null) => void
+  onDetection?: (detection: FrameDetection | null) => void
   statusMessage?: string
 }
 
@@ -18,8 +19,13 @@ const STATUS_LABEL: Record<string, string> = {
   error: 'Something went wrong.',
 }
 
+const DOMINANT_HAND_OPTIONS: DominantHand[] = ['Left', 'Right']
+
 export function WebcamPanel({ enabled, onDetection, statusMessage }: WebcamPanelProps) {
-  const { videoRef, detection, status, error, fps } = useHandLandmarker({ enabled, numHands: 1 })
+  const { progress, setDominantHand } = useProgress()
+  const dominantHand = progress.dominantHand
+  const { videoRef, detection, status, error, switchError, fps, cameras, activeDeviceId, selectCamera } =
+    useHandLandmarker({ enabled, dominantHand })
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -31,11 +37,8 @@ export function WebcamPanel({ enabled, onDetection, statusMessage }: WebcamPanel
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    if (detection) {
-      drawHandSkeleton(ctx, detection.landmarks, canvas.width, canvas.height)
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-    }
+    // drawHands clears the frame itself, so an empty list is also "erase".
+    drawHands(ctx, detection?.hands ?? [], canvas.width, canvas.height)
   }, [detection])
 
   return (
@@ -48,11 +51,51 @@ export function WebcamPanel({ enabled, onDetection, statusMessage }: WebcamPanel
             {status === 'error' ? (error ?? 'Something went wrong.') : STATUS_LABEL[status]}
           </div>
         )}
+        <div className="webcam-panel__hud">
+          {cameras.length > 1 && (
+            <select
+              className="webcam-panel__hud-control webcam-panel__camera-select"
+              aria-label="Choose camera"
+              value={activeDeviceId ?? ''}
+              disabled={status !== 'running'}
+              onChange={(event) => selectCamera(event.target.value)}
+            >
+              {cameras.map((camera, index) => (
+                <option key={camera.deviceId} value={camera.deviceId}>
+                  {camera.label || `Camera ${index + 1}`}
+                </option>
+              ))}
+            </select>
+          )}
+          <div
+            className="webcam-panel__hud-control webcam-panel__hand-picker"
+            role="group"
+            aria-label="Which hand you sign with"
+          >
+            <span className="webcam-panel__hand-picker-label">I sign with</span>
+            <span className="webcam-panel__hand-picker-options">
+              {DOMINANT_HAND_OPTIONS.map((hand) => (
+                <button
+                  key={hand}
+                  type="button"
+                  className="webcam-panel__hand-option"
+                  aria-pressed={dominantHand === hand}
+                  onClick={() => setDominantHand(hand)}
+                >
+                  {hand}
+                </button>
+              ))}
+            </span>
+          </div>
+        </div>
       </div>
       <div className="webcam-panel__footer">
         <span>{statusMessage ?? STATUS_LABEL[status]}</span>
         {status === 'running' && <span className="webcam-panel__fps">{fps} fps</span>}
       </div>
+      {/* A failed camera switch leaves the previous camera running, so this is a
+          non-blocking notice rather than the full-stage error overlay. */}
+      {switchError && <p className="webcam-panel__switch-error">{switchError}</p>}
     </div>
   )
 }

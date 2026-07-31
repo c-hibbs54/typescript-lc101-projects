@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { Logo } from './Logo'
 import './Navbar.css'
 
 const LINKS = [
@@ -13,8 +14,8 @@ export function Navbar() {
   return (
     <header className="navbar">
       <NavLink to="/" className="navbar__brand" end>
-        <span className="navbar__brand-mark">🤟</span>
-        SignLoop
+        <Logo />
+        SignJutsu
       </NavLink>
       <nav className="navbar__links">
         {LINKS.map((link) => (

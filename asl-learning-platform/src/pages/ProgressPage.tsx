@@ -24,21 +24,21 @@ export function ProgressPage() {
       </div>
 
       <section className="grid stat-grid">
-        <div className="card stat-card">
+        <div className="card channel stat-card">
           <span className="stat-card__value">
             {masteredCount}/{RECOGNIZABLE_SIGNS.length}
           </span>
           <span className="stat-card__label">letters mastered</span>
         </div>
-        <div className="card stat-card">
+        <div className="card channel stat-card">
           <span className="stat-card__value">{progress.streakDays}</span>
           <span className="stat-card__label">day streak</span>
         </div>
-        <div className="card stat-card">
+        <div className="card channel stat-card">
           <span className="stat-card__value">{progress.quizHighScore}</span>
           <span className="stat-card__label">quiz high score</span>
         </div>
-        <div className="card stat-card">
+        <div className="card channel stat-card">
           <span className="stat-card__value">{progress.quizAttempts}</span>
           <span className="stat-card__label">quizzes taken</span>
         </div>

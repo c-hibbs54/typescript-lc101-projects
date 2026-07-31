@@ -6,7 +6,7 @@ import { ProgressBar } from '../components/ProgressBar'
 import { CandidateList } from '../components/CandidateList'
 import { useProgress } from '../context/ProgressContext'
 import { useSustainedMatch } from '../hooks/useSustainedMatch'
-import type { ClassificationResult, HandDetectionResult } from '../types/asl'
+import type { ClassificationResult, FrameDetection } from '../types/asl'
 import '../styles/shared-practice.css'
 import './QuizPage.css'
 
@@ -93,8 +93,11 @@ export function QuizPage() {
     }
   }, [phase, score, recordQuizResult])
 
-  const handleDetection = useCallback((detection: HandDetectionResult | null) => {
-    setClassification(detection ? classifyHandShape(detection.landmarks) : null)
+  // Only the primary (dominant) hand is graded, so a second hand wandering into
+  // frame can never hijack the classification.
+  const handleDetection = useCallback((detection: FrameDetection | null) => {
+    const landmarks = detection?.primary?.landmarks
+    setClassification(landmarks ? classifyHandShape(landmarks) : null)
   }, [])
 
   const restart = useCallback(() => {

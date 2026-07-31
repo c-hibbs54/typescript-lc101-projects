@@ -16,6 +16,23 @@
 .learn__detail {
   position: sticky;
   bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.learn__detail-text {
+  flex: 1;
+  min-width: 240px;
+}
+
+.learn__detail-text h3 {
+  margin-top: 0;
+}
+
+.learn__detail-text p {
+  margin-bottom: 0;
 }
 
 .learn__word-list {

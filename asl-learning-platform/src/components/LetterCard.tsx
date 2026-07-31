@@ -12,7 +12,7 @@ export function LetterCard({ sign, mastered, selected, onSelect }: LetterCardPro
   return (
     <button
       type="button"
-      className={`letter-card card${selected ? ' letter-card--selected' : ''}`}
+      className={`letter-card card channel${selected ? ' letter-card--selected' : ''}`}
       onClick={() => onSelect?.(sign)}
     >
       <div className="letter-card__top">

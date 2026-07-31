@@ -1,4 +1,4 @@
-name: Deploy SignLoop to GitHub Pages
+name: Deploy SignJutsu to GitHub Pages
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     branches: [master, claude/asl-learning-gesture-recognition-6efoug]
     paths:
       - 'asl-learning-platform/**'
-      - '.github/workflows/deploy-signloop.yml'
+      - '.github/workflows/deploy-signjutsu.yml'
   workflow_dispatch:
 
 permissions:

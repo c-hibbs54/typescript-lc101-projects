@@ -1,9 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { MASTERY_ACCURACY, MASTERY_THRESHOLD } from '../types/asl'
-import type { LetterProgress, ProgressState } from '../types/asl'
+import type { DominantHand, LetterProgress, ProgressState } from '../types/asl'
 
-const STORAGE_KEY = 'signloop:progress:v1'
+const STORAGE_KEY = 'signjutsu:progress:v1'
+/** Pre-rename key; read once so existing learners keep their progress. */
+const LEGACY_STORAGE_KEY = 'signloop:progress:v1'
 
 function emptyState(): ProgressState {
   return {
@@ -12,13 +14,14 @@ function emptyState(): ProgressState {
     quizAttempts: 0,
     streakDays: 0,
     lastActiveDate: null,
+    dominantHand: 'Right',
   }
 }
 
 function loadState(): ProgressState {
   if (typeof window === 'undefined') return emptyState()
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY)
     if (!raw) return emptyState()
     const parsed = JSON.parse(raw) as Partial<ProgressState>
     return { ...emptyState(), ...parsed, letters: parsed.letters ?? {} }
@@ -54,6 +57,7 @@ interface ProgressContextValue {
   recordQuizResult: (score: number) => void
   resetProgress: () => void
   isMastered: (letterId: string) => boolean
+  setDominantHand: (hand: DominantHand) => void
 }
 
 const ProgressContext = createContext<ProgressContextValue | null>(null)
@@ -103,9 +107,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   const isMastered = useCallback((letterId: string) => Boolean(progress.letters[letterId]?.mastered), [progress])
 
+  const setDominantHand = useCallback((dominantHand: DominantHand) => {
+    setProgress((prev) => ({ ...prev, dominantHand }))
+  }, [])
+
   const value = useMemo(
-    () => ({ progress, recordAttempt, recordQuizResult, resetProgress, isMastered }),
-    [progress, recordAttempt, recordQuizResult, resetProgress, isMastered],
+    () => ({ progress, recordAttempt, recordQuizResult, resetProgress, isMastered, setDominantHand }),
+    [progress, recordAttempt, recordQuizResult, resetProgress, isMastered, setDominantHand],
   )
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>

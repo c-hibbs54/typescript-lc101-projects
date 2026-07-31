@@ -1,6 +1,6 @@
-# SignLoop — learn ASL fingerspelling with your webcam
+# SignJutsu — learn ASL fingerspelling with your webcam
 
-SignLoop is a browser-only ASL (American Sign Language) fingerspelling tutor. It uses your webcam and an
+SignJutsu is a browser-only ASL (American Sign Language) fingerspelling tutor. It uses your webcam and an
 on-device hand-tracking model to give you real-time feedback on whether your handshape matches the letter
 you're practicing — no video is ever uploaded anywhere.
 

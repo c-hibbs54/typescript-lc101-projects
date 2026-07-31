@@ -4,9 +4,10 @@ import { classifyHandShape } from '../lib/classifier'
 import { WebcamPanel } from '../components/WebcamPanel'
 import { ProgressBar } from '../components/ProgressBar'
 import { CandidateList } from '../components/CandidateList'
+import { GhostHand } from '../components/GhostHand'
 import { useProgress } from '../context/ProgressContext'
 import { useSustainedMatch } from '../hooks/useSustainedMatch'
-import type { ClassificationResult, HandDetectionResult, ProgressState } from '../types/asl'
+import type { ClassificationResult, FrameDetection, ProgressState } from '../types/asl'
 import '../styles/shared-practice.css'
 import './PracticePage.css'
 
@@ -30,8 +31,11 @@ export function PracticePage() {
   const targetId = queue[queueIndex] ?? null
   const targetSign = targetId ? getSignById(targetId) : undefined
 
-  const handleDetection = useCallback((detection: HandDetectionResult | null) => {
-    setClassification(detection ? classifyHandShape(detection.landmarks) : null)
+  // Only the primary (dominant) hand is graded, so a second hand wandering into
+  // frame can never hijack the classification.
+  const handleDetection = useCallback((detection: FrameDetection | null) => {
+    const landmarks = detection?.primary?.landmarks
+    setClassification(landmarks ? classifyHandShape(landmarks) : null)
   }, [])
 
   const advance = useCallback(() => {
@@ -92,6 +96,7 @@ export function PracticePage() {
               </button>
               {showHint && (
                 <div className="practice__hint">
+                  <GhostHand signId={targetSign.id} size={120} />
                   <p>{targetSign.handshapeDescription}</p>
                   <p>💡 {targetSign.tip}</p>
                 </div>

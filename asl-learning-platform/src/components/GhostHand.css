@@ -1,0 +1,96 @@
+.ghost-hand {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  /* Default role, in case a hand is ever drawn without a role modifier: violet,
+     i.e. the main signing hand. A role class on the hand's own <g> overrides
+     these inherited values. */
+  --hand-colour: var(--hand-primary);
+  --hand-glow: var(--hand-primary-glow);
+  perspective: 700px;
+  margin: 0 auto;
+}
+
+.ghost-hand__stage {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: ghost-hand-idle 7s ease-in-out infinite;
+  transition: transform 0.2s ease-out;
+}
+
+@keyframes ghost-hand-idle {
+  0%,
+  100% {
+    transform: rotateX(calc(6deg + var(--tilt-x))) rotateY(calc(-14deg + var(--tilt-y)));
+  }
+  50% {
+    transform: rotateX(calc(6deg + var(--tilt-x))) rotateY(calc(14deg + var(--tilt-y)));
+  }
+}
+
+.ghost-hand__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Hand-role colour convention (see index.css): the main/dominant signing hand
+   is always violet, a supporting second hand always green. Every rule below
+   paints with --hand-colour / --hand-glow, so a hand's role is the only thing
+   that decides its colour - never a hardcoded hex. */
+.ghost-hand__hand--primary {
+  --hand-colour: var(--hand-primary);
+  --hand-glow: var(--hand-primary-glow);
+}
+
+.ghost-hand__hand--secondary {
+  --hand-colour: var(--hand-secondary);
+  --hand-glow: var(--hand-secondary-glow);
+  /* Sits behind and slightly smaller than the primary hand; easing it back
+     keeps the dominant hand the one the eye lands on first. */
+  opacity: 0.88;
+}
+
+.ghost-hand__glow path {
+  fill: none;
+  stroke: var(--hand-glow);
+  stroke-width: 22;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ghost-hand__glow path:first-child {
+  fill: var(--hand-glow);
+  fill-opacity: 0.3;
+}
+
+.ghost-hand__glow {
+  opacity: 0.55;
+  filter: blur(8px);
+}
+
+.ghost-hand__palm {
+  fill: color-mix(in srgb, var(--hand-colour) 50%, transparent);
+  stroke: color-mix(in srgb, var(--hand-glow) 65%, var(--hand-colour) 35%);
+  stroke-width: 2.5;
+}
+
+.ghost-hand__finger {
+  fill: none;
+  stroke: color-mix(in srgb, var(--hand-colour) 78%, var(--hand-glow) 22%);
+  stroke-width: 15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+
+.ghost-hand__thumb {
+  stroke-width: 17;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost-hand__stage {
+    animation: none;
+    transform: rotateX(6deg) rotateY(-8deg);
+  }
+}

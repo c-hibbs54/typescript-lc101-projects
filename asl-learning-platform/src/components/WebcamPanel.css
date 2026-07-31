@@ -55,3 +55,99 @@
 .webcam-panel__fps {
   font-variant-numeric: tabular-nums;
 }
+
+/* Stacked HUD controls over the top-right of the video stage. */
+.webcam-panel__hud {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  max-width: calc(100% - 1.2rem);
+}
+
+.webcam-panel__hud-control {
+  max-width: 100%;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.webcam-panel__camera-select {
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+}
+
+.webcam-panel__camera-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.webcam-panel__hand-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.3rem 0.25rem 0.55rem;
+}
+
+.webcam-panel__hand-picker-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.webcam-panel__hand-picker-options {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.webcam-panel__hand-option {
+  padding: 0.2rem 0.5rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.webcam-panel__hand-option:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+/* The chosen hand is the one drawn violet, so the selected chip borrows the
+   same token as the primary-hand overlay. */
+.webcam-panel__hand-option[aria-pressed='true'] {
+  color: var(--hand-primary);
+  background: var(--color-accent-soft);
+  border-color: var(--hand-primary);
+}
+
+.webcam-panel__hand-option:focus-visible {
+  outline: 2px solid var(--hand-primary);
+  outline-offset: 1px;
+}
+
+/* Non-blocking notice for a failed camera switch; the previous camera is still
+   live, so this must not cover the video or disable anything. */
+.webcam-panel__switch-error {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.82rem;
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+  border-radius: var(--radius-md);
+}

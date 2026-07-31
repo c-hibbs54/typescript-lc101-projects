@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CURRICULUM_UNITS, getSignById, PRACTICE_WORDS } from '../data/curriculum'
 import { LetterCard } from '../components/LetterCard'
+import { GhostHand } from '../components/GhostHand'
 import { useProgress } from '../context/ProgressContext'
 import type { AslSignLesson } from '../types/asl'
 import './LearnPage.css'
@@ -57,10 +58,13 @@ export function LearnPage() {
 
       {selected && (
         <div className="learn__detail card">
-          <h3>
-            {selected.displayName} — {selected.handshapeDescription}
-          </h3>
-          <p>{selected.tip}</p>
+          <GhostHand signId={selected.id} size={150} />
+          <div className="learn__detail-text">
+            <h3>
+              {selected.displayName} — {selected.handshapeDescription}
+            </h3>
+            <p>{selected.tip}</p>
+          </div>
         </div>
       )}
     </div>
