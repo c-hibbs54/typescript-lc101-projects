@@ -1,5 +1,6 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
+import { AmbientBackground } from './components/AmbientBackground'
 import { ProgressProvider } from './context/ProgressContext'
 import { HomePage } from './pages/HomePage'
 import { LearnPage } from './pages/LearnPage'
@@ -7,9 +8,16 @@ import { PracticePage } from './pages/PracticePage'
 import { QuizPage } from './pages/QuizPage'
 import { ProgressPage } from './pages/ProgressPage'
 
+/** Routes that run the webcam + hand-tracking model, and so want the cheap background. */
+const CAMERA_ROUTES = ['/practice', '/quiz']
+
 function App() {
+  const { pathname } = useLocation()
+  const onCameraRoute = CAMERA_ROUTES.includes(pathname)
+
   return (
     <ProgressProvider>
+      <AmbientBackground variant={onCameraRoute ? 'calm' : 'full'} />
       <div className="app-shell">
         <Navbar />
         <main className="app-main">

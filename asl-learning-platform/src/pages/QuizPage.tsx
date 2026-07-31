@@ -4,6 +4,7 @@ import { classifyHandShape } from '../lib/classifier'
 import { WebcamPanel } from '../components/WebcamPanel'
 import { ProgressBar } from '../components/ProgressBar'
 import { CandidateList } from '../components/CandidateList'
+import { Mascot } from '../components/Mascot'
 import { useProgress } from '../context/ProgressContext'
 import { useSustainedMatch } from '../hooks/useSustainedMatch'
 import type { ClassificationResult, FrameDetection } from '../types/asl'
@@ -115,6 +116,7 @@ export function QuizPage() {
     return (
       <div className="quiz quiz--finished">
         <div className="card quiz__summary">
+          <Mascot mood={score > 0 ? 'cheer' : 'happy'} size={140} />
           <h1>Quiz complete!</h1>
           <p className="quiz__score">
             {score} / {questions.length}

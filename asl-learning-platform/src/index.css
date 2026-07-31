@@ -114,6 +114,9 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  /* Above the fixed AmbientBackground (z-index 0). */
+  position: relative;
+  z-index: 1;
 }
 
 .app-main {
@@ -315,6 +318,66 @@ a {
 
 .progress-track__fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-lime-vivid) 100%);
+  background: linear-gradient(
+    100deg,
+    var(--color-accent) 0%,
+    var(--color-lime-vivid) 45%,
+    var(--color-accent) 100%
+  );
+  background-size: 220% 100%;
   transition: width 0.1s linear;
+  animation: progress-shimmer 2.6s linear infinite;
+}
+
+@keyframes progress-shimmer {
+  from {
+    background-position: 220% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+/* Channel tiles drift very slightly, so a resting page is never fully static.
+   Staggered per column via nth-child so they don't pulse in lockstep. */
+.channel {
+  animation: channel-idle 7s ease-in-out infinite;
+}
+
+.channel:nth-child(2n) {
+  animation-delay: -2.3s;
+}
+
+.channel:nth-child(3n) {
+  animation-delay: -4.6s;
+}
+
+@keyframes channel-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Hover still wins: it re-declares transform with a heavier lift. */
+.channel:hover {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-track__fill,
+  .channel {
+    animation: none;
+  }
+
+  .channel {
+    transform: none;
+  }
+
+  .channel:hover {
+    transform: none;
+  }
 }

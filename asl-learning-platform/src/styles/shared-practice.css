@@ -17,6 +17,13 @@
   gap: 0.75rem;
 }
 
+.practice__target-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .practice__target-glyph {
   font-size: 3rem;
   font-weight: 800;

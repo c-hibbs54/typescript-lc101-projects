@@ -5,6 +5,15 @@
 }
 
 .home__hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.home__hero-copy {
+  flex: 1 1 380px;
   max-width: 640px;
 }
 

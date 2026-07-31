@@ -1,0 +1,286 @@
+/* Tomo the study companion. Everything here animates only transform/opacity so
+   it runs on the compositor and doesn't compete with hand tracking on the main
+   thread. All motion stops under prefers-reduced-motion (bottom of file). */
+
+.mascot {
+  --gaze-x: 0;
+  --gaze-y: 0;
+  --bob-duration: 3.4s;
+  --blink-period: 5.2s;
+  overflow: visible;
+  display: block;
+}
+
+.mascot__float {
+  transform-origin: 100px 150px;
+  animation: mascot-bob var(--bob-duration) ease-in-out infinite;
+}
+
+@keyframes mascot-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.1deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(1.1deg);
+  }
+}
+
+.mascot__shadow {
+  fill: rgba(30, 19, 48, 0.16);
+  animation: mascot-shadow var(--bob-duration) ease-in-out infinite;
+}
+
+@keyframes mascot-shadow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(0.88);
+    opacity: 0.35;
+  }
+}
+
+/* --- Character ------------------------------------------------------------ */
+
+.mascot__body {
+  fill: var(--color-accent);
+}
+
+.mascot__sheen {
+  fill: #fff;
+  opacity: 0.17;
+}
+
+.mascot__ear {
+  fill: var(--color-accent);
+}
+
+.mascot__ear-inner {
+  fill: var(--color-lime-vivid);
+  opacity: 0.85;
+}
+
+.mascot__band {
+  fill: var(--color-highlight);
+}
+
+.mascot__band-tail {
+  fill: var(--color-highlight);
+  transform-origin: 157px 86px;
+}
+
+.mascot__band-tail--a {
+  animation: mascot-tail 2.1s ease-in-out infinite;
+}
+
+.mascot__band-tail--b {
+  animation: mascot-tail 2.1s ease-in-out infinite 0.28s;
+  opacity: 0.85;
+}
+
+@keyframes mascot-tail {
+  0%,
+  100% {
+    transform: rotate(-7deg) scaleY(0.97);
+  }
+  50% {
+    transform: rotate(9deg) scaleY(1.03);
+  }
+}
+
+/* --- Eyes ---------------------------------------------------------------- */
+
+.mascot__eye-white {
+  fill: #fffdf8;
+}
+
+.mascot__pupils {
+  /* Cursor-following glance. Small range keeps it cute, not googly. */
+  transform: translate(calc(var(--gaze-x) * 4.5px), calc(var(--gaze-y) * 3.5px));
+  transition: transform 0.18s ease-out;
+}
+
+.mascot__pupil {
+  fill: #241a3d;
+}
+
+.mascot__glint {
+  fill: #fff;
+}
+
+.mascot__glint--small {
+  opacity: 0.75;
+}
+
+.mascot__eye-arc {
+  fill: none;
+  stroke: #241a3d;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.mascot__lids {
+  transform-origin: center;
+}
+
+.mascot__lid {
+  fill: var(--color-accent);
+  transform-box: fill-box;
+  transform-origin: center top;
+  transform: scaleY(0);
+  animation: mascot-blink var(--blink-period) ease-in-out infinite;
+}
+
+/* Lids drop and snap back inside a small slice of the cycle, so the character
+   mostly has its eyes open. */
+@keyframes mascot-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(0);
+  }
+  95%,
+  96.5% {
+    transform: scaleY(1);
+  }
+}
+
+.mascot__cheek {
+  fill: var(--color-highlight);
+  opacity: 0.45;
+}
+
+.mascot__mouth {
+  fill: none;
+  stroke: #241a3d;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.mascot__mouth--open {
+  fill: #241a3d;
+  stroke: none;
+}
+
+/* --- Hands --------------------------------------------------------------- */
+
+/* A shade lighter than the body so the mitts read as separate shapes. */
+.mascot__hand ellipse {
+  fill: color-mix(in srgb, #fff 22%, var(--color-accent) 78%);
+}
+
+.mascot__hand--wave {
+  transform-origin: 40px 128px;
+}
+
+/* --- Moods --------------------------------------------------------------- */
+
+.mascot--happy .mascot__float,
+.mascot--cheer .mascot__float {
+  --bob-duration: 1.5s;
+}
+
+.mascot--cheer .mascot__hand--wave {
+  animation: mascot-wave 0.55s ease-in-out infinite;
+}
+
+.mascot--idle .mascot__hand--wave {
+  animation: mascot-wave 4.5s ease-in-out infinite;
+}
+
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-24deg);
+  }
+  75% {
+    transform: rotate(14deg);
+  }
+}
+
+/* Looking up and away, as if working something out. */
+.mascot--thinking .mascot__pupils {
+  transform: translate(3px, -5px);
+}
+
+.mascot__sparkles {
+  opacity: 0;
+}
+
+.mascot__sparkle {
+  fill: var(--color-lime-vivid);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mascot--cheer .mascot__sparkles {
+  opacity: 1;
+}
+
+.mascot--cheer .mascot__sparkle {
+  animation: mascot-sparkle 1.15s ease-in-out infinite;
+}
+
+.mascot--cheer .mascot__sparkle:nth-child(2) {
+  animation-delay: 0.22s;
+}
+
+.mascot--cheer .mascot__sparkle:nth-child(3) {
+  animation-delay: 0.44s;
+}
+
+@keyframes mascot-sparkle {
+  0%,
+  100% {
+    transform: scale(0.4) rotate(0deg);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(1.15) rotate(35deg);
+    opacity: 1;
+  }
+}
+
+/* --- Reduced motion ------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* The mood rules that set these animations are more specific than a bare
+     class, so the resets have to match that specificity to win. */
+  .mascot__float,
+  .mascot__shadow,
+  .mascot__band-tail,
+  .mascot__band-tail--a,
+  .mascot__band-tail--b,
+  .mascot__lid,
+  .mascot--idle .mascot__hand--wave,
+  .mascot--happy .mascot__hand--wave,
+  .mascot--thinking .mascot__hand--wave,
+  .mascot--cheer .mascot__hand--wave,
+  .mascot--cheer .mascot__sparkle {
+    animation: none;
+  }
+
+  .mascot__float {
+    transform: none;
+  }
+
+  /* Keep the lids fully open rather than mid-blink. */
+  .mascot__lid {
+    transform: scaleY(0);
+  }
+
+  .mascot__pupils {
+    transform: none;
+    transition: none;
+  }
+
+  .mascot--cheer .mascot__sparkles {
+    opacity: 1;
+  }
+}

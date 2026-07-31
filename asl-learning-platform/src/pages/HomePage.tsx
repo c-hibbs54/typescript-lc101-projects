@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { PLATFORM_DISCLAIMER, RECOGNIZABLE_SIGNS } from '../data/curriculum'
+import { Mascot, type MascotMood } from '../components/Mascot'
 import { useProgress } from '../context/ProgressContext'
 import './HomePage.css'
 
@@ -7,22 +8,29 @@ export function HomePage() {
   const { progress } = useProgress()
   const masteredCount = RECOGNIZABLE_SIGNS.filter((sign) => progress.letters[sign.id]?.mastered).length
 
+  // Tomo reflects how you're doing: celebrating once you've mastered a letter,
+  // pleased while a streak is alive, otherwise just waving hello.
+  const welcomeMood: MascotMood = masteredCount > 0 ? 'cheer' : progress.streakDays > 0 ? 'happy' : 'idle'
+
   return (
     <div className="home">
       <section className="home__hero">
-        <h1>Learn ASL fingerspelling with your webcam</h1>
-        <p>
-          SignJutsu watches your hand shape through your webcam and tells you, in real time, how close you are
-          to the correct handshape — all running privately in your browser. Nothing is ever uploaded.
-        </p>
-        <div className="home__cta">
-          <Link className="btn btn--primary" to="/practice">
-            Start practicing
-          </Link>
-          <Link className="btn btn--secondary" to="/learn">
-            Browse the alphabet
-          </Link>
+        <div className="home__hero-copy">
+          <h1>Learn ASL fingerspelling with your webcam</h1>
+          <p>
+            SignJutsu watches your hand shape through your webcam and tells you, in real time, how close you
+            are to the correct handshape — all running privately in your browser. Nothing is ever uploaded.
+          </p>
+          <div className="home__cta">
+            <Link className="btn btn--primary" to="/practice">
+              Start practicing
+            </Link>
+            <Link className="btn btn--secondary" to="/learn">
+              Browse the alphabet
+            </Link>
+          </div>
         </div>
+        <Mascot mood={welcomeMood} size={200} label={`Tomo, your practice companion, looking ${welcomeMood}`} />
       </section>
 
       <section className="grid stat-grid">

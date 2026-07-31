@@ -5,6 +5,7 @@ import { WebcamPanel } from '../components/WebcamPanel'
 import { ProgressBar } from '../components/ProgressBar'
 import { CandidateList } from '../components/CandidateList'
 import { GhostHand } from '../components/GhostHand'
+import { Mascot, type MascotMood } from '../components/Mascot'
 import { useProgress } from '../context/ProgressContext'
 import { useSustainedMatch } from '../hooks/useSustainedMatch'
 import type { ClassificationResult, FrameDetection, ProgressState } from '../types/asl'
@@ -68,6 +69,10 @@ export function PracticePage() {
 
   const topCandidates = useMemo(() => classification?.candidates ?? [], [classification])
 
+  // Tomo cheers a confirmed letter, leans in while you're closing on it, and
+  // otherwise just keeps you company.
+  const mascotMood: MascotMood = justConfirmed ? 'cheer' : holdProgress > 0.05 ? 'happy' : 'thinking'
+
   return (
     <div className="practice">
       <div className="section-heading">
@@ -86,7 +91,11 @@ export function PracticePage() {
         <div className="practice__target card">
           {targetSign ? (
             <>
-              <span className="practice__target-glyph">{targetSign.displayName}</span>
+              <div className="practice__target-head">
+                <span className="practice__target-glyph">{targetSign.displayName}</span>
+                {/* gaze off: the camera page already has the model on the main thread. */}
+                <Mascot mood={mascotMood} size={92} gaze={false} />
+              </div>
               <ProgressBar value={holdProgress} max={1} />
               <p className="practice__target-status">
                 {justConfirmed ? '✅ Nice! Moving on…' : 'Hold the shape steady to confirm.'}

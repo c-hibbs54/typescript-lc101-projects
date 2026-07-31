@@ -1,0 +1,158 @@
+/* Always-in-motion decorative layer. Fixed behind everything, input-transparent,
+   transform/opacity-only so it composites off the main thread. */
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambient__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(58px);
+  opacity: 0.4;
+  will-change: transform;
+}
+
+.ambient__blob--violet {
+  width: 46vmax;
+  height: 46vmax;
+  top: -14vmax;
+  left: -10vmax;
+  background: var(--color-accent);
+  animation: ambient-drift-a 27s ease-in-out infinite;
+}
+
+.ambient__blob--lime {
+  width: 34vmax;
+  height: 34vmax;
+  top: 42vh;
+  right: -12vmax;
+  background: var(--color-lime-vivid);
+  opacity: 0.24;
+  animation: ambient-drift-b 33s ease-in-out infinite;
+}
+
+.ambient__blob--orange {
+  width: 26vmax;
+  height: 26vmax;
+  bottom: -10vmax;
+  left: 34vw;
+  background: var(--color-highlight);
+  opacity: 0.2;
+  animation: ambient-drift-c 39s ease-in-out infinite;
+}
+
+@keyframes ambient-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(7vw, 5vh, 0) scale(1.1);
+  }
+  66% {
+    transform: translate3d(3vw, 11vh, 0) scale(0.95);
+  }
+}
+
+@keyframes ambient-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-9vw, -7vh, 0) scale(1.14);
+  }
+}
+
+@keyframes ambient-drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  40% {
+    transform: translate3d(-6vw, -4vh, 0) scale(1.08);
+  }
+  75% {
+    transform: translate3d(5vw, -8vh, 0) scale(0.94);
+  }
+}
+
+/* --- Drifting glyphs ----------------------------------------------------- */
+
+.ambient__glyphs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ambient__glyph {
+  fill: var(--color-accent);
+  opacity: 0.07;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ambient__glyph--1 {
+  animation: ambient-float-1 21s ease-in-out infinite;
+}
+
+.ambient__glyph--2 {
+  animation: ambient-float-2 26s ease-in-out infinite;
+}
+
+.ambient__glyph--3 {
+  animation: ambient-float-1 31s ease-in-out infinite reverse;
+}
+
+.ambient__glyph--4 {
+  animation: ambient-float-2 24s ease-in-out infinite reverse;
+}
+
+@keyframes ambient-float-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+  50% {
+    transform: translate(26px, -34px) rotate(9deg);
+  }
+}
+
+@keyframes ambient-float-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(6deg);
+  }
+  50% {
+    transform: translate(-30px, 26px) rotate(-10deg);
+  }
+}
+
+/* On camera pages the glyphs carry the motion on their own. */
+.ambient--calm .ambient__glyph {
+  opacity: 0.05;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ambient__blob--violet {
+    opacity: 0.3;
+  }
+
+  .ambient__glyph {
+    fill: var(--color-accent-strong);
+    opacity: 0.09;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient__blob,
+  .ambient__glyph {
+    animation: none;
+  }
+}
