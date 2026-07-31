@@ -279,9 +279,12 @@ a {
   color: var(--color-accent);
 }
 
+/* 4px of offset, not 2: a skewed slab pseudo-element leans ~3px past its own
+   border box at two corners, and a ring sitting closer than that would touch
+   the violet fill (2.2:1) instead of the page background (4.1:1). */
 :focus-visible {
   outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: 4px;
 }
 
 /* --- Skewed slab primitive ----------------------------------------------- *
@@ -348,6 +351,16 @@ a {
   z-index: -1;
   background: var(--card-fill, var(--color-surface));
   clip-path: var(--panel-cut);
+}
+
+/* `clip-path` clips an element's outline along with everything else, so a
+   focused panel would otherwise have its focus ring sliced away entirely.
+   Instead the panel thickens its own edge in the focus colour, which is drawn
+   inside the clipped silhouette and therefore always visible. */
+.card:focus-visible {
+  outline: none;
+  --card-edge: var(--color-focus);
+  --panel-edge-w: 5px;
 }
 
 /* "Channel" tile: a card that reads as pickable rather than static. Its

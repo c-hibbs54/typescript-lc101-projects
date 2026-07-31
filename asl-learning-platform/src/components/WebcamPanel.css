@@ -101,10 +101,11 @@
   box-shadow: none;
 }
 
+/* Left square on purpose: a clip-path here would clip this native control's
+   focus outline away, and a <select> is not worth a bespoke focus treatment. */
 .webcam-panel__camera-select {
   padding: 0.32rem 0.55rem;
   cursor: pointer;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
 
 .webcam-panel__camera-select:disabled {
@@ -180,9 +181,11 @@
   background: var(--hand-primary);
 }
 
+/* Tighter than the global 4px: these chips sit inside a small HUD box, and
+   their slab is short enough that 2px already clears the skew overhang. */
 .webcam-panel__hand-option:focus-visible {
   outline: 3px solid var(--color-focus);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
 /* Non-blocking notice for a failed camera switch; the previous camera is still
