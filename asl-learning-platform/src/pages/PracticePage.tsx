@@ -4,7 +4,7 @@ import { classifyHandShape } from '../lib/classifier'
 import { WebcamPanel } from '../components/WebcamPanel'
 import { ProgressBar } from '../components/ProgressBar'
 import { CandidateList } from '../components/CandidateList'
-import { GhostHand } from '../components/GhostHand'
+import { SignImage } from '../components/SignImage'
 import { Mascot, type MascotMood } from '../components/Mascot'
 import { useProgress } from '../context/ProgressContext'
 import { useSustainedMatch } from '../hooks/useSustainedMatch'
@@ -105,7 +105,7 @@ export function PracticePage() {
               </button>
               {showHint && (
                 <div className="practice__hint">
-                  <GhostHand signId={targetSign.id} size={120} />
+                  <SignImage signId={targetSign.id} size={120} />
                   <p>{targetSign.handshapeDescription}</p>
                   <p>💡 {targetSign.tip}</p>
                 </div>

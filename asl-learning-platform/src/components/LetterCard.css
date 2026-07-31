@@ -1,4 +1,5 @@
 .letter-card {
+  --card-edge: var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -6,44 +7,91 @@
   cursor: pointer;
   font: inherit;
   color: inherit;
-  border: 1px solid var(--color-border);
-  transition: border-color 0.15s ease;
+  padding: 1.15rem 1.15rem 1.1rem;
+  transition: transform var(--dur-snap) var(--ease-snap), filter var(--dur-snap) ease,
+    background-color var(--dur-snap) ease;
 }
 
 .letter-card:hover {
-  border-color: var(--color-accent);
+  --card-edge: var(--color-accent);
 }
 
+/* Selection is unmistakable: violet edge, violet slab behind the glyph, and the
+   tile snapped forward. It arrives on state change and then holds still. */
 .letter-card--selected {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent-soft);
+  --card-edge: var(--color-accent);
+  --panel-edge-w: 4px;
+  --channel-accent: var(--color-accent);
+  filter: drop-shadow(7px 7px 0 var(--drop-hard-lift));
+}
+
+/* Selection runs the accent bar the full width of the tile. This is a state,
+   not motion: it lands and then holds. */
+.letter-card--selected::before {
+  transform: scaleX(1);
 }
 
 .letter-card__top {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
 }
 
+/* The letter itself is the loudest thing on the tile: a heavy oblique glyph on
+   an angled slab. */
 .letter-card__glyph {
-  font-size: 1.6rem;
-  font-weight: 800;
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.35rem;
+  padding: 0.1rem 0.5rem 0.15rem;
+  font-size: 1.55rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--color-on-accent);
+  transition: color var(--dur-snap) ease;
+}
+
+.letter-card__glyph::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-accent);
+  transform: skewX(var(--slab-skew));
+  transition: background-color var(--dur-snap) ease;
+}
+
+.letter-card--selected .letter-card__glyph {
+  color: var(--color-on-lime);
+}
+
+.letter-card--selected .letter-card__glyph::before {
+  background: var(--color-lime-vivid);
 }
 
 .letter-card__description {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
+  line-height: 1.5;
   min-height: 3.2em;
 }
 
 .letter-card__tip {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
 }
 
 .letter-card__footer {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 0.15rem;
 }

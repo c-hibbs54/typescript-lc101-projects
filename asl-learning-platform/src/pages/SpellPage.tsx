@@ -3,7 +3,7 @@ import { SPELLING_DICTIONARY } from '../data/curriculum'
 import { evaluateSpelling } from '../lib/spelling'
 import { WebcamPanel } from '../components/WebcamPanel'
 import { ProgressBar } from '../components/ProgressBar'
-import { GhostHand } from '../components/GhostHand'
+import { SignImage } from '../components/SignImage'
 import { useStableSign } from '../hooks/useStableSign'
 import type { FrameDetection } from '../types/asl'
 import '../styles/shared-practice.css'
@@ -123,7 +123,7 @@ export function SpellPage() {
 
           {reading?.best && (
             <div className="spell__last">
-              <GhostHand signId={reading.best.letter} size={104} />
+              <SignImage signId={reading.best.letter} size={104} />
               <span>
                 last read: <strong>{reading.best.letter}</strong> ·{' '}
                 {Math.round(reading.best.confidence * 100)}%

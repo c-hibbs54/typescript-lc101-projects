@@ -1,0 +1,51 @@
+/* Reference-artwork plate. Angular cut corner and hard drop shadow to sit with
+   the rest of the chrome; the plate stays light in both themes because the
+   source artwork is drawn on white. */
+
+.sign-image {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  perspective: 700px;
+  margin: 0 auto;
+  flex: 0 0 auto;
+}
+
+.sign-image__stage {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 0.35rem;
+  background: #f7f4fb;
+  border: 2px solid var(--color-accent, #5b2a86);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+  transform-style: preserve-3d;
+  animation: sign-image-idle 8s ease-in-out infinite;
+  transition: transform 0.2s ease-out;
+}
+
+@keyframes sign-image-idle {
+  0%,
+  100% {
+    transform: rotateX(calc(3deg + var(--tilt-x))) rotateY(calc(-7deg + var(--tilt-y)));
+  }
+  50% {
+    transform: rotateX(calc(3deg + var(--tilt-x))) rotateY(calc(7deg + var(--tilt-y)));
+  }
+}
+
+.sign-image__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  /* The artwork is line art on white; a touch of contrast keeps it crisp when
+     scaled down into small hint panels. */
+  filter: saturate(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sign-image__stage {
+    animation: none;
+    transform: none;
+  }
+}

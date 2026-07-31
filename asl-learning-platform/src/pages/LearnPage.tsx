@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { CURRICULUM_UNITS, getSignById, PRACTICE_WORDS } from '../data/curriculum'
 import { LetterCard } from '../components/LetterCard'
-import { GhostHand } from '../components/GhostHand'
+import { SignImage } from '../components/SignImage'
+import { PageHeading } from '../components/PageHeading'
 import { useProgress } from '../context/ProgressContext'
 import type { AslSignLesson } from '../types/asl'
 import './LearnPage.css'
@@ -12,17 +13,21 @@ export function LearnPage() {
 
   return (
     <div className="learn">
-      <div className="section-heading">
-        <div>
-          <h1>The ASL manual alphabet</h1>
-          <p>Work through each unit at your own pace, then head to Practice to try it with your webcam.</p>
-        </div>
-      </div>
+      <PageHeading eyebrow="Learn" ja="学ぶ" title="The ASL manual alphabet">
+        <p>Work through each unit at your own pace, then head to Practice to try it with your webcam.</p>
+      </PageHeading>
 
-      {CURRICULUM_UNITS.map((unit) => (
+      {CURRICULUM_UNITS.map((unit, i) => (
         <section key={unit.id} className="learn__unit">
-          <h2>{unit.title}</h2>
-          <p className="learn__unit-description">{unit.description}</p>
+          <div className="learn__unit-head">
+            <span className="learn__unit-index" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div>
+              <h2>{unit.title}</h2>
+              <p className="learn__unit-description">{unit.description}</p>
+            </div>
+          </div>
           <div className="grid grid--letters">
             {unit.signIds
               .map((id) => getSignById(id))
@@ -41,11 +46,18 @@ export function LearnPage() {
       ))}
 
       <section className="learn__unit">
-        <h2>Bonus: words to spell</h2>
-        <p className="learn__unit-description">
-          Once the alphabet feels comfortable, practice fingerspelling these words letter by letter — read the
-          hint, then spell out the word (on your own, or letter-by-letter in Practice mode).
-        </p>
+        <div className="learn__unit-head">
+          <span className="learn__unit-index" aria-hidden="true">
+            ＋
+          </span>
+          <div>
+            <h2>Bonus: words to spell</h2>
+            <p className="learn__unit-description">
+              Once the alphabet feels comfortable, practice fingerspelling these words letter by letter — read
+              the hint, then spell out the word (on your own, or letter-by-letter in Practice mode).
+            </p>
+          </div>
+        </div>
         <ul className="learn__word-list">
           {PRACTICE_WORDS.map((w) => (
             <li key={w.word} className="learn__word-item card">
@@ -58,7 +70,7 @@ export function LearnPage() {
 
       {selected && (
         <div className="learn__detail card">
-          <GhostHand signId={selected.id} size={150} />
+          <SignImage signId={selected.id} size={150} />
           <div className="learn__detail-text">
             <h3>
               {selected.displayName} — {selected.handshapeDescription}

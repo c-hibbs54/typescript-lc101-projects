@@ -1,7 +1,7 @@
 .webcam-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .webcam-panel__stage {
@@ -10,9 +10,10 @@
   max-width: 640px;
   aspect-ratio: 4 / 3;
   background: #0b0b14;
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  clip-path: var(--panel-cut);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  filter: drop-shadow(5px 5px 0 var(--drop-hard));
 }
 
 .webcam-panel__video,
@@ -32,6 +33,20 @@
   transform: none;
 }
 
+/* Angled violet bar welded to the top edge of the viewfinder. */
+.webcam-panel__stage::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 46%;
+  height: 6px;
+  z-index: 3;
+  background: var(--color-lime-vivid);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  pointer-events: none;
+}
+
 .webcam-panel__overlay-message {
   position: absolute;
   inset: 0;
@@ -41,14 +56,20 @@
   text-align: center;
   padding: 1.5rem;
   color: #fff;
-  background: rgba(11, 11, 20, 0.65);
-  font-weight: 500;
+  background: rgba(11, 11, 20, 0.72);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
 }
 
 .webcam-panel__footer {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
@@ -60,29 +81,30 @@
 .webcam-panel__hud {
   position: absolute;
   top: 0.6rem;
-  right: 0.6rem;
+  right: 0.9rem;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.4rem;
-  max-width: calc(100% - 1.2rem);
+  max-width: calc(100% - 1.8rem);
 }
 
 .webcam-panel__hud-control {
   max-width: 100%;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--color-text);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--color-accent);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .webcam-panel__camera-select {
-  padding: 0.35rem 0.6rem;
+  padding: 0.32rem 0.55rem;
   cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
 
 .webcam-panel__camera-select:disabled {
@@ -94,13 +116,14 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.25rem 0.3rem 0.25rem 0.55rem;
+  padding: 0.22rem 0.28rem 0.22rem 0.5rem;
 }
 
 .webcam-panel__hand-picker-label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 0.64rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-muted);
   white-space: nowrap;
@@ -112,42 +135,67 @@
 }
 
 .webcam-panel__hand-option {
+  position: relative;
+  isolation: isolate;
   padding: 0.2rem 0.5rem;
   font: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.76rem;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--color-text-muted);
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border: none;
+  border-radius: 0;
   cursor: pointer;
+  transition: color var(--dur-snap) ease;
+}
+
+.webcam-panel__hand-option::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: transparent;
+  transform: skewX(var(--slab-skew));
+  transition: background-color var(--dur-snap) ease;
 }
 
 .webcam-panel__hand-option:hover {
   color: var(--color-text);
+}
+
+.webcam-panel__hand-option:hover::before {
   background: var(--color-surface-hover);
 }
 
 /* The chosen hand is the one drawn violet, so the selected chip borrows the
    same token as the primary-hand overlay. */
 .webcam-panel__hand-option[aria-pressed='true'] {
-  color: var(--hand-primary);
-  background: var(--color-accent-soft);
-  border-color: var(--hand-primary);
+  color: var(--color-on-accent);
+}
+
+.webcam-panel__hand-option[aria-pressed='true']::before {
+  background: var(--hand-primary);
 }
 
 .webcam-panel__hand-option:focus-visible {
-  outline: 2px solid var(--hand-primary);
+  outline: 3px solid var(--color-highlight);
   outline-offset: 1px;
 }
 
 /* Non-blocking notice for a failed camera switch; the previous camera is still
-   live, so this must not cover the video or disable anything. */
+   live, so this must not cover the video or disable anything. Body text stays
+   at full contrast and the orange carries the alarm as an edge, rather than
+   tinting the text down to a marginal ratio. */
 .webcam-panel__switch-error {
   margin: 0;
-  padding: 0.45rem 0.7rem;
-  font-size: 0.82rem;
-  color: var(--color-warning);
-  background: var(--color-warning-soft);
-  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-highlight-soft);
+  border-left: 5px solid var(--color-highlight-vivid);
+  border-radius: 0;
 }

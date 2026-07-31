@@ -6,7 +6,7 @@
 
 .spell__controls {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
 }
 
@@ -17,39 +17,58 @@
 .spell__hold {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .spell__hold-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 0.74rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
 .spell__samples {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
+/* The word being built is the page's headline figure: an angled violet slab
+   with the letters set heavy and widely tracked. */
 .spell__word {
-  min-height: 3.4rem;
+  position: relative;
+  isolation: isolate;
+  min-height: 3.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  padding: 0.5rem 0.9rem;
+  clip-path: var(--panel-cut);
+  background: var(--color-accent);
+}
+
+.spell__word::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
   background: var(--color-accent-soft);
-  padding: 0.5rem 0.75rem;
+  clip-path: var(--panel-cut);
 }
 
 .spell__word-text {
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-size: clamp(1.9rem, 7vw, 2.5rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.14em;
   color: var(--color-accent);
   word-break: break-all;
+  line-height: 1.15;
 }
 
 .spell__word-empty {
@@ -59,35 +78,41 @@
 
 .spell__match {
   margin: 0;
-  font-weight: 700;
-  color: var(--color-success);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--color-lime-strong);
 }
 
 .spell__hint {
   margin: 0;
   font-size: 0.88rem;
+  line-height: 1.5;
   color: var(--color-text-muted);
 }
 
 .spell__hint--correct {
-  color: var(--color-warning);
+  color: var(--color-text);
 }
 
+/* Full-contrast body text with the alarm carried by an orange edge, rather
+   than orange text that would only just clear AA on this tint. */
 .spell__rejected {
   margin: 0;
   font-size: 0.85rem;
-  padding: 0.45rem 0.7rem;
-  border-radius: var(--radius-md);
-  color: var(--color-warning);
-  background: var(--color-warning-soft);
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-text);
+  background: var(--color-highlight-soft);
+  border-left: 5px solid var(--color-highlight-vivid);
 }
 
 .spell__last {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  border-top: 1px solid var(--color-border);
-  padding-top: 0.75rem;
-  font-size: 0.88rem;
+  border-top: 3px solid var(--color-border);
+  padding-top: 0.85rem;
+  font-size: 0.86rem;
   color: var(--color-text-muted);
 }
