@@ -190,15 +190,15 @@
 
 /* Non-blocking notice for a failed camera switch; the previous camera is still
    live, so this must not cover the video or disable anything. Body text stays
-   at full contrast and the orange carries the alarm as an edge, rather than
-   tinting the text down to a marginal ratio. */
+   at full contrast and the warning colour carries the alarm as an edge, rather
+   than tinting the text down to a marginal ratio. */
 .webcam-panel__switch-error {
   margin: 0;
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text);
-  background: var(--color-highlight-soft);
-  border-left: 5px solid var(--color-highlight-vivid);
+  background: var(--color-warning-soft);
+  border-left: 5px solid var(--color-warning);
   border-radius: 0;
 }

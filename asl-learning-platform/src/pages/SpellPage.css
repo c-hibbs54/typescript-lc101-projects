@@ -76,12 +76,13 @@
   color: var(--color-text-muted);
 }
 
+/* A recognised word is a success state, so it uses the semantic token. */
 .spell__match {
   margin: 0;
   font-weight: 900;
   font-style: italic;
   letter-spacing: 0.04em;
-  color: var(--color-lime-strong);
+  color: var(--color-success);
 }
 
 .spell__hint {
@@ -95,16 +96,16 @@
   color: var(--color-text);
 }
 
-/* Full-contrast body text with the alarm carried by an orange edge, rather
-   than orange text that would only just clear AA on this tint. */
+/* Full-contrast body text with the alarm carried by the edge, rather than
+   coloured text that would only just clear AA on this tint. */
 .spell__rejected {
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.5;
   padding: 0.5rem 0.75rem;
   color: var(--color-text);
-  background: var(--color-highlight-soft);
-  border-left: 5px solid var(--color-highlight-vivid);
+  background: var(--color-warning-soft);
+  border-left: 5px solid var(--color-warning);
 }
 
 .spell__last {

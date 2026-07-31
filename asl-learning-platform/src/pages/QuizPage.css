@@ -55,7 +55,7 @@
   text-transform: uppercase;
 }
 
-/* Three-tone: the miss state is carried by warm orange, not a fourth hue. */
+/* A missed question is a state, not styling, so it uses the warning colour. */
 .quiz__feedback--miss {
-  color: var(--color-highlight-strong);
+  color: var(--color-warning);
 }

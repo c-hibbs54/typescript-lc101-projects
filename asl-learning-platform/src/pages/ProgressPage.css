@@ -59,10 +59,10 @@
   color: var(--color-text-muted);
 }
 
-/* Destructive band: warm orange edge keeps it inside the three-tone palette
-   while still reading as "careful here". */
+/* Destructive band: red edge, because this really is the danger zone. Theme
+   tones carry the design language; this carries a warning. */
 .progress-page__danger {
-  --card-edge: var(--color-highlight-vivid);
+  --card-edge: var(--color-danger);
   --panel-edge-w: 4px;
   display: flex;
   align-items: center;

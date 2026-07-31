@@ -23,12 +23,16 @@
   --color-highlight-soft: #fde9d7;
   --color-highlight-vivid: #ff7a1a;
 
-  --color-success: var(--color-lime);
+  /* Strong lime, not plain: the plain tone only reaches ~3.0:1 on white, which
+     is why success text previously bypassed this token entirely. */
+  --color-success: var(--color-lime-strong);
   --color-success-soft: var(--color-lime-soft);
   --color-warning: #b45309;
   --color-warning-soft: #fef3c7;
   --color-danger: #dc2626;
   --color-danger-soft: #fee2e2;
+  /* Ink that stays legible on the danger fill; flips per theme. */
+  --color-on-danger: #ffffff;
 
   /* ------------------------------------------------------------------ *
    * ANGULAR DESIGN LANGUAGE
@@ -146,6 +150,8 @@
     --color-warning-soft: #3a2c0c;
     --color-danger: #f87171;
     --color-danger-soft: #3a1414;
+    /* The dark-theme danger red is light, so it takes dark ink. */
+    --color-on-danger: #1c1129;
 
     /* The violet is a light tint on dark, so text on top of it flips to ink. */
     --color-on-accent: var(--color-ink);
@@ -494,14 +500,17 @@ a {
 
 /* Destructive, still inside the three-tone palette: dark ink on vivid orange
    reads as a warning without adding a fourth hue. */
+/* Destructive actions are red, not a theme tone. The three-tone rule governs the
+   site's design language; a semantic state colour is doing a different job, and
+   dulling "delete everything" into the brand palette loses real information. */
 .btn--danger {
-  --btn-fill: var(--color-highlight-vivid);
-  --btn-edge: var(--color-accent);
-  color: var(--color-on-highlight);
+  --btn-fill: var(--color-danger);
+  --btn-edge: var(--color-danger);
+  color: var(--color-on-danger);
 }
 
 .btn--danger:hover:not(:disabled) {
-  --btn-fill: var(--color-highlight);
+  --btn-fill: color-mix(in srgb, var(--color-danger) 85%, #000 15%);
 }
 
 /* --- Badges -------------------------------------------------------------- */
