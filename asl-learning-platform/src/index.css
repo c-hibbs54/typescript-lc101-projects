@@ -39,6 +39,25 @@
   --hand-secondary: #4d9a0f;
   --hand-secondary-glow: #7cc82a;
 
+  /* THREE-TONE ART DIRECTION (see the reference sheet this was matched to).
+     Every illustrated thing - reference hands, mascot, future characters -
+     is built from exactly three tones plus dark linework:
+       1. shade  - deep purple, the shadow side
+       2. base   - mid violet, the body colour
+       3. accent - green, the lit extremity (fingertips, highlights)
+     ...outlined in `--art-line` and haloed in `--art-glow`. */
+  --art-shade: #4c2170;
+  --art-base: #8b5cc4;
+  --art-accent: #a8d84a;
+  --art-line: #2f1b45;
+  --art-glow: #b07de0;
+
+  /* The supporting hand keeps the same three-tone construction, but its base
+     and accent swap toward green so role still reads at a glance. */
+  --art-shade-support: #2f5c10;
+  --art-base-support: #6a9e34;
+  --art-accent-support: #cbe86b;
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
@@ -82,6 +101,18 @@
     --hand-primary-glow: #c4a2ff;
     --hand-secondary: #8fd63a;
     --hand-secondary-glow: #b6ff2e;
+
+    /* Same three tones, lifted so the artwork doesn't sink into a dark page.
+       Linework stays dark but softens, or it reads as holes at this contrast. */
+    --art-shade: #5f2d8a;
+    --art-base: #a276d8;
+    --art-accent: #bce85e;
+    --art-line: #1c1129;
+    --art-glow: #c79bf0;
+
+    --art-shade-support: #3d7418;
+    --art-base-support: #86bf47;
+    --art-accent-support: #d8f582;
 
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
     --shadow-channel: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 26px rgba(178, 138, 255, 0.16);
@@ -338,17 +369,23 @@ a {
   }
 }
 
-/* Channel tiles drift very slightly, so a resting page is never fully static.
-   Staggered per column via nth-child so they don't pulse in lockstep. */
-.channel {
+/* Decorative channel tiles drift very slightly, so a resting page is never
+   fully static. Staggered per column via nth-child so they don't pulse in
+   lockstep.
+
+   Deliberately excludes interactive tiles (`:not(button)`): a click target that
+   never stops moving is harder to hit, which matters for anyone with limited
+   motor control - and it's the letter cards, the most-clicked thing in the app,
+   that are buttons. They still get the hover lift below. */
+.channel:not(button) {
   animation: channel-idle 7s ease-in-out infinite;
 }
 
-.channel:nth-child(2n) {
+.channel:not(button):nth-child(2n) {
   animation-delay: -2.3s;
 }
 
-.channel:nth-child(3n) {
+.channel:not(button):nth-child(3n) {
   animation-delay: -4.6s;
 }
 

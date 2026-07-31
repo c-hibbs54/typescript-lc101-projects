@@ -1,0 +1,93 @@
+.spell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.spell__controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.spell__readout {
+  gap: 1rem;
+}
+
+.spell__hold {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.spell__hold-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.spell__samples {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.spell__word {
+  min-height: 3.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  padding: 0.5rem 0.75rem;
+}
+
+.spell__word-text {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: var(--color-accent);
+  word-break: break-all;
+}
+
+.spell__word-empty {
+  font-size: 2rem;
+  color: var(--color-text-muted);
+}
+
+.spell__match {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-success);
+}
+
+.spell__hint {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.spell__hint--correct {
+  color: var(--color-warning);
+}
+
+.spell__rejected {
+  margin: 0;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-md);
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+}
+
+.spell__last {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}

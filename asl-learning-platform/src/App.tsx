@@ -6,10 +6,11 @@ import { HomePage } from './pages/HomePage'
 import { LearnPage } from './pages/LearnPage'
 import { PracticePage } from './pages/PracticePage'
 import { QuizPage } from './pages/QuizPage'
+import { SpellPage } from './pages/SpellPage'
 import { ProgressPage } from './pages/ProgressPage'
 
 /** Routes that run the webcam + hand-tracking model, and so want the cheap background. */
-const CAMERA_ROUTES = ['/practice', '/quiz']
+const CAMERA_ROUTES = ['/practice', '/quiz', '/spell']
 
 function App() {
   const { pathname } = useLocation()
@@ -26,6 +27,7 @@ function App() {
             <Route path="/learn" element={<LearnPage />} />
             <Route path="/practice" element={<PracticePage />} />
             <Route path="/quiz" element={<QuizPage />} />
+            <Route path="/spell" element={<SpellPage />} />
             <Route path="/progress" element={<ProgressPage />} />
           </Routes>
         </main>

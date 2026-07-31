@@ -105,25 +105,52 @@ interface FingerGeometry {
   len2: number
 }
 
+/** A point in the hand's local drawing space. */
+export interface Point2D {
+  x: number
+  y: number
+}
+
+/**
+ * One digit's centre-line, plus the two endpoints the illustration needs to
+ * run a gradient along it: purple where it leaves the palm, green at the tip.
+ */
+export interface Digit {
+  d: string
+  base: Point2D
+  tip: Point2D
+}
+
 /** A smooth quadratic path from base -> bend -> tip for one finger. */
-function fingerPath({ baseX, baseY, curl, splayDeg, len1, len2 }: FingerGeometry): string {
+function fingerPath({ baseX, baseY, curl, splayDeg, len1, len2 }: FingerGeometry): Digit {
   const dir1 = splayDeg
-  const l1 = len1 * (1 - 0.22 * curl)
+  // Curled fingers foreshorten hard - a fist is compact, and without this the
+  // tips arc out over the knuckles like a claw instead of folding in.
+  const l1 = len1 * (1 - 0.36 * curl)
   const rad1 = (dir1 * Math.PI) / 180
   const bendX = baseX + l1 * Math.sin(rad1)
   const bendY = baseY - l1 * Math.cos(rad1)
 
-  const dir2 = dir1 + curl * 150
-  const l2 = len2 * (1 - 0.15 * curl)
+  const dir2 = dir1 + curl * 122
+  const l2 = len2 * (1 - 0.3 * curl)
   const rad2 = (dir2 * Math.PI) / 180
   const tipX = bendX + l2 * Math.sin(rad2)
   const tipY = bendY - l2 * Math.cos(rad2)
 
-  return `M ${baseX.toFixed(1)},${baseY.toFixed(1)} Q ${bendX.toFixed(1)},${bendY.toFixed(1)} ${tipX.toFixed(1)},${tipY.toFixed(1)}`
+  return {
+    d: `M ${baseX.toFixed(1)},${baseY.toFixed(1)} Q ${bendX.toFixed(1)},${bendY.toFixed(1)} ${tipX.toFixed(1)},${tipY.toFixed(1)}`,
+    base: { x: baseX, y: baseY },
+    tip: { x: tipX, y: tipY },
+  }
 }
 
-function thumbPath(baseX: number, baseY: number, curl: number, out: number): string {
-  const dir1 = lerp(30, 88, out)
+function thumbPath(baseX: number, baseY: number, curl: number, out: number): Digit {
+  // `out` (how far the thumb tip sits from the knuckles) sets how far the thumb
+  // swings away from the palm, but a folded thumb also comes *across* the palm
+  // rather than just bending at its own joint - so curl pulls the whole digit
+  // inward. This is what separates a tucked B/S/M/N thumb from an extended L/Y
+  // one; the pose features are distances, not angles, so it is an approximation.
+  const dir1 = lerp(30, 88, out) - curl * 30
   const l1 = 46 * (1 - 0.3 * curl)
   const rad1 = (dir1 * Math.PI) / 180
   const bendX = baseX + l1 * Math.sin(rad1)
@@ -135,19 +162,33 @@ function thumbPath(baseX: number, baseY: number, curl: number, out: number): str
   const tipX = bendX + l2 * Math.sin(rad2)
   const tipY = bendY - l2 * Math.cos(rad2)
 
-  return `M ${baseX.toFixed(1)},${baseY.toFixed(1)} Q ${bendX.toFixed(1)},${bendY.toFixed(1)} ${tipX.toFixed(1)},${tipY.toFixed(1)}`
+  return {
+    d: `M ${baseX.toFixed(1)},${baseY.toFixed(1)} Q ${bendX.toFixed(1)},${bendY.toFixed(1)} ${tipX.toFixed(1)},${tipY.toFixed(1)}`,
+    base: { x: baseX, y: baseY },
+    tip: { x: tipX, y: tipY },
+  }
 }
 
+/**
+ * Palm + forearm silhouette.
+ *
+ * Shaped like an actual hand rather than a rounded box: the top edge arcs over
+ * the knuckles (so the finger bases at y 86-95 sit embedded in it), the pinky
+ * side falls away to the heel of the palm, the thumb side bulges at the thenar
+ * pad where `thumbPath` is anchored (160, 140), and the forearm narrows below
+ * before the wrist mask fades it out.
+ */
 const PALM_PATH =
-  'M70,258 L70,200 C70,152 64,124 67,107 C69,96 80,90 96,88 L144,88 C159,90 169,97 171,109 ' +
-  'C173,124 169,152 169,200 L169,258 Z'
+  'M78,118 C80,104 98,90 118,89 C136,90 148,100 152,114 ' +
+  'C158,132 160,146 157,158 C155,180 149,194 145,208 L145,256 ' +
+  'L87,256 L87,208 C83,194 77,180 75,158 C73,146 74,130 78,118 Z'
 
 /** The SVG paths of one hand, all in the same local (unrotated) coordinates. */
 export interface HandPaths {
   palm: string
   /** Finger centre-lines in paint order, back to front - see {@link FINGER_PATH_ORDER}. */
-  fingers: string[]
-  thumb: string
+  fingers: Digit[]
+  thumb: Digit
 }
 
 /**
@@ -178,13 +219,17 @@ export function buildHandPaths(pose: number[]): HandPaths {
 
   return {
     palm: PALM_PATH,
+    // Finger lengths are ~1.15x the palm's knuckle-to-heel span, matching real
+    // proportions - a shorter finger set reads as a mitten rather than a hand.
     fingers: [
-      fingerPath({ baseX: 82, baseY: 95, curl: pinkyCurl, splayDeg: -18 - ringPinkySpread * 14, len1: 34, len2: 24 }),
-      fingerPath({ baseX: 100, baseY: 88, curl: ringCurl, splayDeg: -6 - middleRingSpread * 8, len1: 42, len2: 28 }),
-      fingerPath({ baseX: 118, baseY: 86, curl: middleCurl, splayDeg: 2, len1: 50, len2: 32 }),
-      fingerPath({ baseX: 136, baseY: 90, curl: indexCurl, splayDeg: 14 + indexMiddleSpread * 14, len1: 44, len2: 30 }),
+      fingerPath({ baseX: 84, baseY: 103, curl: pinkyCurl, splayDeg: -18 - ringPinkySpread * 14, len1: 40, len2: 28 }),
+      fingerPath({ baseX: 101, baseY: 96, curl: ringCurl, splayDeg: -6 - middleRingSpread * 8, len1: 50, len2: 33 }),
+      fingerPath({ baseX: 118, baseY: 94, curl: middleCurl, splayDeg: 2, len1: 56, len2: 36 }),
+      fingerPath({ baseX: 135, baseY: 98, curl: indexCurl, splayDeg: 14 + indexMiddleSpread * 14, len1: 52, len2: 35 }),
     ],
-    thumb: thumbPath(160, 140, thumbCurl, thumbOut),
+    // Anchored inside the palm silhouette, not on its edge: the thumb is drawn
+    // behind the palm so this root tucks under it and reads as attached.
+    thumb: thumbPath(142, 156, thumbCurl, thumbOut),
   }
 }
 
@@ -299,7 +344,7 @@ function pathPoints(d: string): Point[] {
 }
 
 function handPoints(paths: HandPaths): Point[] {
-  return [paths.palm, ...paths.fingers, paths.thumb].flatMap(pathPoints)
+  return [paths.palm, ...paths.fingers.map((f) => f.d), paths.thumb.d].flatMap(pathPoints)
 }
 
 function boundsOf(points: Point[], padding: number): Rect {

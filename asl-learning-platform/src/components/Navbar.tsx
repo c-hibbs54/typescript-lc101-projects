@@ -7,6 +7,7 @@ const LINKS = [
   { to: '/learn', label: 'Learn' },
   { to: '/practice', label: 'Practice' },
   { to: '/quiz', label: 'Quiz' },
+  { to: '/spell', label: 'Spell' },
   { to: '/progress', label: 'Progress' },
 ]
 

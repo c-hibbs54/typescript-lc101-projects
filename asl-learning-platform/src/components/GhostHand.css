@@ -1,11 +1,17 @@
+/* Ghost-hand reference illustration, in the app's three-tone art style:
+   deep purple shade / violet base / green accent tips, over dark linework.
+   Colours come from the --art-* tokens in index.css (see the art-direction
+   note there), never hardcoded, so light and dark themes both follow. */
+
 .ghost-hand {
   --tilt-x: 0deg;
   --tilt-y: 0deg;
-  /* Default role, in case a hand is ever drawn without a role modifier: violet,
-     i.e. the main signing hand. A role class on the hand's own <g> overrides
-     these inherited values. */
-  --hand-colour: var(--hand-primary);
-  --hand-glow: var(--hand-primary-glow);
+  /* Default role, in case a hand is ever drawn without a role modifier: the
+     violet main-hand tones. A role class on the hand's own <g> overrides these. */
+  --tone-shade: var(--art-shade);
+  --tone-base: var(--art-base);
+  --tone-accent: var(--art-accent);
+  --tone-glow: var(--art-glow);
   perspective: 700px;
   margin: 0 auto;
 }
@@ -34,57 +40,108 @@
   overflow: visible;
 }
 
-/* Hand-role colour convention (see index.css): the main/dominant signing hand
-   is always violet, a supporting second hand always green. Every rule below
-   paints with --hand-colour / --hand-glow, so a hand's role is the only thing
-   that decides its colour - never a hardcoded hex. */
+/* --- Role tones ----------------------------------------------------------- */
+
 .ghost-hand__hand--primary {
-  --hand-colour: var(--hand-primary);
-  --hand-glow: var(--hand-primary-glow);
+  --tone-shade: var(--art-shade);
+  --tone-base: var(--art-base);
+  --tone-accent: var(--art-accent);
+  --tone-glow: var(--art-glow);
 }
 
 .ghost-hand__hand--secondary {
-  --hand-colour: var(--hand-secondary);
-  --hand-glow: var(--hand-secondary-glow);
-  /* Sits behind and slightly smaller than the primary hand; easing it back
-     keeps the dominant hand the one the eye lands on first. */
-  opacity: 0.88;
-}
-
-.ghost-hand__glow path {
-  fill: none;
-  stroke: var(--hand-glow);
-  stroke-width: 22;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.ghost-hand__glow path:first-child {
-  fill: var(--hand-glow);
-  fill-opacity: 0.3;
-}
-
-.ghost-hand__glow {
-  opacity: 0.55;
-  filter: blur(8px);
-}
-
-.ghost-hand__palm {
-  fill: color-mix(in srgb, var(--hand-colour) 50%, transparent);
-  stroke: color-mix(in srgb, var(--hand-glow) 65%, var(--hand-colour) 35%);
-  stroke-width: 2.5;
-}
-
-.ghost-hand__finger {
-  fill: none;
-  stroke: color-mix(in srgb, var(--hand-colour) 78%, var(--hand-glow) 22%);
-  stroke-width: 15;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  --tone-shade: var(--art-shade-support);
+  --tone-base: var(--art-base-support);
+  --tone-accent: var(--art-accent-support);
+  --tone-glow: var(--art-accent-support);
+  /* Sits behind the dominant hand, so it eases back slightly. */
   opacity: 0.9;
 }
 
-.ghost-hand__thumb {
+/* --- Gradient stops (violet base -> green tip) ---------------------------- */
+
+.ghost-hand__stop-base {
+  stop-color: var(--tone-base);
+}
+
+.ghost-hand__stop-mid {
+  stop-color: color-mix(in srgb, var(--tone-base) 55%, var(--tone-accent) 45%);
+}
+
+.ghost-hand__stop-accent {
+  stop-color: var(--tone-accent);
+}
+
+/* --- Glow ---------------------------------------------------------------- */
+
+.ghost-hand__glow {
+  opacity: 0.5;
+  filter: blur(7px);
+}
+
+.ghost-hand__glow path {
+  fill: var(--tone-glow);
+  stroke: var(--tone-glow);
+  stroke-width: 20;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- Palm --------------------------------------------------------------- */
+
+.ghost-hand__palm-line {
+  fill: var(--art-line);
+  stroke: var(--art-line);
+  stroke-width: 9;
+  stroke-linejoin: round;
+}
+
+.ghost-hand__palm {
+  fill: var(--tone-base);
+  stroke: none;
+}
+
+/* Third tone: the shadowed hollow of the palm and the thenar pad. Clipped to
+   the palm silhouette, so it shades without changing the outline. */
+.ghost-hand__palm-shade {
+  fill: var(--tone-shade);
+  opacity: 0.5;
+  filter: blur(6px);
+}
+
+/* --- Digits ------------------------------------------------------------- */
+
+.ghost-hand__digit-line {
+  fill: none;
+  stroke: var(--art-line);
+  stroke-width: 23;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ghost-hand__digit {
+  fill: none;
+  stroke-width: 15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* A thin lit edge along each digit, the cel-shading highlight pass. Kept low:
+   at higher opacity the white washes the violet out to grey. */
+.ghost-hand__digit-sheen {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0.13;
+  transform: translate(-3.5px, -2px);
+}
+
+.ghost-hand__digit-line--thumb {
+  stroke-width: 23;
+}
+
+.ghost-hand__digit--thumb {
   stroke-width: 17;
 }
 

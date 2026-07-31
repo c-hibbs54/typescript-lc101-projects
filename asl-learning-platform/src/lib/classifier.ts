@@ -294,8 +294,20 @@ export function classifyHandShape(landmarks: HandLandmarks): ClassificationResul
   if (!Array.isArray(landmarks) || landmarks.length !== 21) {
     return { best: null, candidates: [] }
   }
+  return classifyFeatures(getFeatureVector(landmarks))
+}
 
-  const featureVector = getFeatureVector(landmarks)
+/**
+ * Classifies an already-computed feature vector.
+ *
+ * Exists so a caller can average features over several still frames and
+ * classify the average - far steadier than classifying one noisy frame, since
+ * landmark jitter largely cancels out. See `stableCapture.ts`.
+ */
+export function classifyFeatures(featureVector: number[]): ClassificationResult {
+  if (!Array.isArray(featureVector) || featureVector.length !== FEATURE_COUNT) {
+    return { best: null, candidates: [] }
+  }
 
   const scored: ClassificationCandidate[] = Object.entries(LETTER_PROTOTYPES).map(
     ([letter, prototype]) => ({

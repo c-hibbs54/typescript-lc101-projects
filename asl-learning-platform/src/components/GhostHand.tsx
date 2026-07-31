@@ -1,28 +1,87 @@
-import { useMemo, useRef } from 'react'
-import { buildGhostArtwork, getGhostSign, type GhostHandArt } from '../lib/ghostHandPoses'
+import { useId, useMemo, useRef } from 'react'
+import { buildGhostArtwork, getGhostSign, type Digit, type GhostHandArt } from '../lib/ghostHandPoses'
 import './GhostHand.css'
 
 /**
- * One hand of the illustration: a blurred glow layer under the solid palm,
- * fingers, and thumb. All four take their colour from the role modifier class,
- * never from a hardcoded hex.
+ * One digit, drawn the way the reference art is built up:
+ *   1. a dark outline stroke underneath (the linework),
+ *   2. the body stroke, filled with a gradient that runs from the violet base
+ *      colour where the digit leaves the palm to the green accent at the tip,
+ *   3. a thin inner highlight along the lit edge.
+ * The gradient is per-digit and in the hand's own coordinate space, so a curled
+ * finger still has a green tip and the whole thing rotates with the hand.
  */
-function GhostHandLayer({ role, paths, transform }: GhostHandArt) {
+function DigitPath({ digit, gradientId, wide }: { digit: Digit; gradientId: string; wide?: boolean }) {
+  const cls = wide ? ' ghost-hand__digit--thumb' : ''
+  return (
+    <>
+      <path className={`ghost-hand__digit-line${cls}`} d={digit.d} />
+      <path className={`ghost-hand__digit${cls}`} d={digit.d} stroke={`url(#${gradientId})`} />
+      <path className={`ghost-hand__digit-sheen${cls}`} d={digit.d} />
+    </>
+  )
+}
+
+/**
+ * One hand of the illustration. Painted in the three-tone order the reference
+ * uses: glow halo, dark linework, base fill, shadow tone, then the green-tipped
+ * digits on top.
+ */
+function GhostHandLayer({ art, uid }: { art: GhostHandArt; uid: string }) {
+  const { role, paths, transform } = art
+  const digits = [...paths.fingers, paths.thumb]
+
   return (
     <g className={`ghost-hand__hand ghost-hand__hand--${role}`} transform={transform}>
-      {/* The glow's first child must stay the palm - CSS fills only that one. */}
+      <defs>
+        {digits.map((digit, i) => (
+          <linearGradient
+            key={i}
+            id={`${uid}-${role}-d${i}`}
+            gradientUnits="userSpaceOnUse"
+            x1={digit.base.x}
+            y1={digit.base.y}
+            x2={digit.tip.x}
+            y2={digit.tip.y}
+          >
+            {/* Violet for most of the digit, green only over the last third -
+                the reference keeps its fingers mostly violet and tips them. */}
+            <stop offset="0%" className="ghost-hand__stop-base" />
+            <stop offset="42%" className="ghost-hand__stop-base" />
+            <stop offset="68%" className="ghost-hand__stop-mid" />
+            <stop offset="94%" className="ghost-hand__stop-accent" />
+          </linearGradient>
+        ))}
+      </defs>
+
+      {/* Glow halo */}
       <g className="ghost-hand__glow">
         <path d={paths.palm} />
-        {paths.fingers.map((d, i) => (
-          <path key={i} d={d} />
+        {digits.map((digit, i) => (
+          <path key={i} d={digit.d} />
         ))}
-        <path d={paths.thumb} />
       </g>
+
+      {/* Thumb first, so the palm covers its root and it reads as attached. */}
+      <DigitPath digit={paths.thumb} gradientId={`${uid}-${role}-d${digits.length - 1}`} wide />
+
+      {/* Palm: linework, base fill, then the deep shadow tone in the hollow */}
+      <path className="ghost-hand__palm-line" d={paths.palm} />
       <path className="ghost-hand__palm" d={paths.palm} />
-      {paths.fingers.map((d, i) => (
-        <path key={i} className="ghost-hand__finger" d={d} />
+      <g className="ghost-hand__palm-shade" clipPath={`url(#${uid}-${role}-palmclip)`}>
+        {/* Hollow of the palm, the thenar pad by the thumb, and the shaded
+            pinky-side edge - the three places the reference darkens. */}
+        <ellipse cx="112" cy="156" rx="32" ry="36" />
+        <ellipse cx="147" cy="150" rx="15" ry="26" />
+        <ellipse cx="82" cy="158" rx="11" ry="32" />
+      </g>
+      <clipPath id={`${uid}-${role}-palmclip`}>
+        <path d={paths.palm} />
+      </clipPath>
+
+      {paths.fingers.map((digit, i) => (
+        <DigitPath key={i} digit={digit} gradientId={`${uid}-${role}-d${i}`} />
       ))}
-      <path className="ghost-hand__finger ghost-hand__thumb" d={paths.thumb} />
     </g>
   )
 }
@@ -33,24 +92,24 @@ interface GhostHandProps {
 }
 
 /**
- * A translucent "ghost" illustration of a static handshape, built procedurally
- * from the same pose data the classifier uses (so it's always consistent with
- * what Practice/Quiz actually check for) rather than a traced/photographed
- * reference. Wrapped in a gentle 3D tilt for a pseudo-holographic look - not a
- * live rotating model, just a flat illustration that rocks in perspective.
+ * A reference illustration of a static handshape, drawn procedurally from the
+ * same pose vectors the classifier grades against - so the picture can never
+ * drift from what Practice/Quiz actually check for.
  *
- * All geometry - including rotating the hand to its pose's `handOrientation`,
- * which is what makes G/Q, K/P and H/U look different from each other - comes
- * from `buildGhostArtwork`, so the framing is unit tested against real
- * curriculum values rather than eyeballed here.
+ * Rendered in the app's three-tone art style: deep purple shade, violet base,
+ * green fingertips, dark linework, soft violet halo, and a wrist that fades out
+ * at the bottom. `buildGhostArtwork` handles all geometry, including rotating
+ * each hand to its pose's `handOrientation` (what makes G/Q, K/P and H/U look
+ * different) and framing so nothing clips.
  *
- * Two-handed signs draw a second, smaller supporting hand alongside. Per the
- * illustration convention the main signing hand is always violet and the
- * supporting hand always green; one-handed signs (all of them today) render the
- * single violet hand they always have.
+ * Two-handed signs draw a second, smaller supporting hand: main hand always
+ * violet, supporting hand always green.
  */
 export function GhostHand({ signId, size = 180 }: GhostHandProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  // Gradient/clip ids must be unique per mounted instance, or several hands on
+  // one page all resolve to whichever was defined last.
+  const uid = useId().replace(/:/g, '')
   const artwork = useMemo(() => {
     const sign = getGhostSign(signId)
     return sign ? buildGhostArtwork(sign) : null
@@ -90,10 +149,23 @@ export function GhostHand({ signId, size = 180 }: GhostHandProps) {
     >
       <div className="ghost-hand__stage">
         <svg className="ghost-hand__svg" viewBox={artwork.viewBox} role="img" aria-label={label}>
-          {/* Already ordered supporting-hand-first, so the dominant hand layers in front. */}
-          {artwork.hands.map((hand) => (
-            <GhostHandLayer key={hand.role} {...hand} />
-          ))}
+          <defs>
+            {/* Fades the forearm out at the bottom, like the reference sheet. */}
+            <linearGradient id={`${uid}-fade`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fff" stopOpacity="1" />
+              <stop offset="72%" stopColor="#fff" stopOpacity="1" />
+              <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+            </linearGradient>
+            <mask id={`${uid}-wrist`} maskContentUnits="objectBoundingBox">
+              <rect x="0" y="0" width="1" height="1" fill={`url(#${uid}-fade)`} />
+            </mask>
+          </defs>
+          <g mask={`url(#${uid}-wrist)`}>
+            {/* Already ordered supporting-hand-first, so the main hand is in front. */}
+            {artwork.hands.map((hand) => (
+              <GhostHandLayer key={hand.role} art={hand} uid={uid} />
+            ))}
+          </g>
         </svg>
       </div>
     </div>

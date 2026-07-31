@@ -357,6 +357,27 @@ export const PRACTICE_WORDS: PracticeWord[] = [
   { word: 'JAZZ', hint: 'A musical genre — fittingly, this word uses both motion letters, J and Z, so it can\'t be fully verified live yet.' },
 ]
 
+/**
+ * Words the spelling reader can recognise and correct against.
+ *
+ * Deliberately a short, common-English list rather than a full dictionary: it
+ * exists to reconcile a stream of fingerspelled letters into a word (and to
+ * rescue the classifier's known weak distinctions, e.g. M/N/S/T), and a huge
+ * word list would make near-miss corrections noisier, not better.
+ */
+export const SPELLING_DICTIONARY: string[] = [
+  ...PRACTICE_WORDS.map((w) => w.word),
+  'AND', 'ARE', 'ASK', 'BAD', 'BAG', 'BED', 'BIG', 'BOX', 'BOY', 'BUS',
+  'CALL', 'CARD', 'CITY', 'COLD', 'COME', 'DARK', 'DAY', 'DOOR', 'DOWN',
+  'EAT', 'EGG', 'FACE', 'FAST', 'FIRE', 'FOOD', 'FOOT', 'FRIEND', 'FUN',
+  'GIRL', 'GOOD', 'HAND', 'HAPPY', 'HARD', 'HAT', 'HEAD', 'HELP', 'HOME',
+  'HOT', 'HOUSE', 'KEY', 'KIND', 'LEARN', 'LIGHT', 'LIKE', 'LONG', 'LOOK',
+  'MAN', 'MAP', 'NAME', 'NEW', 'NICE', 'NIGHT', 'OPEN', 'PLAY', 'RED',
+  'ROOM', 'RUN', 'SAD', 'SCHOOL', 'SEE', 'SIGN', 'SIT', 'SLOW', 'SMALL',
+  'SNOW', 'SOFT', 'SONG', 'STOP', 'TALK', 'THANK', 'TIME', 'TOWN', 'TREE',
+  'WALK', 'WARM', 'WATER', 'WIND', 'WORD', 'WORK', 'YES',
+].filter((word, i, all) => all.indexOf(word) === i)
+
 export function getSignById(id: string): AslSignLesson | undefined {
   return ALL_SIGNS.find((sign) => sign.id === id)
 }
