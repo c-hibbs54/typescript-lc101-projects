@@ -70,6 +70,12 @@
   --color-on-lime: var(--color-ink);
   --color-on-highlight: var(--color-ink);
 
+  /* Focus ring. Deliberately its own token rather than `--color-highlight`:
+     the ring has to clear 3:1 against whatever it lands on, which means the
+     darker orange on pale surfaces and the lighter one on dark surfaces.
+     (`--color-highlight` itself only reaches 2.94:1 against the violet.) */
+  --color-focus: var(--color-highlight-strong);
+
   /* Hand-role convention, used by both the live overlay and the ghost-hand
      reference illustrations: the main/dominant signing hand is ALWAYS violet,
      a supporting second hand is ALWAYS green. Single source of truth - don't
@@ -145,6 +151,9 @@
     --color-on-accent: var(--color-ink);
     --color-edge: color-mix(in srgb, var(--color-accent) 34%, var(--color-border));
     --progress-sheen: rgba(255, 255, 255, 0.26);
+    /* Flips to the lighter orange: on a near-black page the dark orange would
+       disappear. 9.2:1 against the page background. */
+    --color-focus: var(--color-highlight);
 
     /* Brighter on dark backgrounds; same violet-primary / green-secondary convention. */
     --hand-primary: #a97bff;
@@ -271,7 +280,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-highlight);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
