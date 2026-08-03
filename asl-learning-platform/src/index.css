@@ -108,6 +108,17 @@
   --art-base-support: #6a9e34;
   --art-accent-support: #cbe86b;
 
+  /* EVA-01 CHARACTER TONES - the mascot and the logo mark.
+     The same three-tone construction as --art-*, but drawn straight from the
+     EVA-01 triad and pinned dark-side-up in both modes. The --art-* tones lift
+     on a dark page so a small reference illustration stays legible; a large
+     character can't take that lift without going lavender, and the unit's
+     violet armour is the whole point. Linework is separate, as ever. */
+  --eva-shade: var(--color-accent-strong);
+  --eva-base: var(--color-accent);
+  --eva-accent: var(--color-lime-vivid);
+  --eva-line: #1c1129;
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
@@ -178,6 +189,13 @@
     --art-shade-support: #3d7418;
     --art-base-support: #86bf47;
     --art-accent-support: #d8f582;
+
+    /* Lifted only far enough to clear a near-black page - 4.3:1 of silhouette
+       against the background - while staying recognisably the violet armour.
+       Deliberately NOT the UI accent, which goes pale lavender here. */
+    --eva-shade: #4b2172;
+    --eva-base: #6f39a4;
+    --eva-line: #150c22;
 
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
     --shadow-channel: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 26px rgba(178, 138, 255, 0.16);

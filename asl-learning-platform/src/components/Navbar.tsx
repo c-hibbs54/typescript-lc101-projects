@@ -20,8 +20,13 @@ export function Navbar() {
   return (
     <header className="navbar">
       <NavLink to="/" className="navbar__brand" end>
-        <Logo />
-        <span className="navbar__wordmark">SignJutsu</span>
+        <Logo size={32} />
+        {/* Set in the app's own heavy oblique type rather than the logo
+            drawing's serif, and split on the same two capitals the drawing uses
+            so the compound name still reads as two words. */}
+        <span className="navbar__wordmark">
+          Sign<span className="navbar__wordmark-accent">Jutsu</span>
+        </span>
       </NavLink>
       <nav className="navbar__links" aria-label="Sections">
         {LINKS.map((link) => (

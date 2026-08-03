@@ -42,6 +42,13 @@
   text-transform: uppercase;
 }
 
+/* The violet half of the lockup. `--color-accent` rather than the character
+   token `--eva-base`: this is text, and the character violet is pinned dark in
+   both modes, which would only reach 1.9:1 on a dark surface. */
+.navbar__wordmark-accent {
+  color: var(--color-accent);
+}
+
 .navbar__links {
   display: flex;
   align-items: stretch;
