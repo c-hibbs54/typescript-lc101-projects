@@ -3,6 +3,12 @@ import './Logo.css'
 
 interface LogoProps {
   size?: number
+  /**
+   * Accessible name. Omit it wherever the mark sits next to the wordmark - which
+   * is everywhere today - so the brand isn't announced twice ("SignJutsu
+   * SignJutsu"). Pass one only if the mark ever stands alone.
+   */
+  label?: string
 }
 
 /**
@@ -17,17 +23,17 @@ interface LogoProps {
  *
  * The wordmark is deliberately not part of this: it is set in the app's own
  * heavy oblique type by whoever places the mark, so the lettering matches the
- * rest of the interface instead of the drawing's serif.
+ * rest of the interface instead of the drawing's serif. Which also means the
+ * mark is decorative by default - see `label`.
  */
-export function Logo({ size = 28 }: LogoProps) {
+export function Logo({ size = 28, label }: LogoProps) {
   return (
     <svg
       className="logo"
       width={size}
       height={size}
       viewBox="0 0 48 48"
-      role="img"
-      aria-label="SignJutsu"
+      {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true })}
     >
       {/* Fill first: the linework below carries knocked-out holes that this
           shows through. */}

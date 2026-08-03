@@ -27,7 +27,7 @@ export function HomePage() {
   const { progress } = useProgress()
   const masteredCount = RECOGNIZABLE_SIGNS.filter((sign) => progress.letters[sign.id]?.mastered).length
 
-  // Tomo reflects how you're doing: celebrating once you've mastered a letter,
+  // Kaeru reflects how you're doing: celebrating once you've mastered a letter,
   // pleased while a streak is alive, otherwise just waving hello.
   const welcomeMood: MascotMood = masteredCount > 0 ? 'cheer' : progress.streakDays > 0 ? 'happy' : 'idle'
 
@@ -51,7 +51,7 @@ export function HomePage() {
           </div>
         </div>
         <div className="home__mascot-stage">
-          <Mascot mood={welcomeMood} size={200} label={`Tomo, your practice companion, looking ${welcomeMood}`} />
+          <Mascot mood={welcomeMood} size={200} label={`Kaeru, your practice companion, looking ${welcomeMood}`} />
         </div>
       </section>
 

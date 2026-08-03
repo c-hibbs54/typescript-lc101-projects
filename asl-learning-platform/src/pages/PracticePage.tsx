@@ -69,7 +69,7 @@ export function PracticePage() {
 
   const topCandidates = useMemo(() => classification?.candidates ?? [], [classification])
 
-  // Tomo cheers a confirmed letter, leans in while you're closing on it, and
+  // Kaeru cheers a confirmed letter, leans in while you're closing on it, and
   // otherwise just keeps you company.
   const mascotMood: MascotMood = justConfirmed ? 'cheer' : holdProgress > 0.05 ? 'happy' : 'thinking'
 
