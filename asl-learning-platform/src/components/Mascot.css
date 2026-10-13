@@ -1,0 +1,293 @@
+/* Kaeru the study companion.
+
+   He is painted from the EVA-01 character tones in index.css - three tones plus
+   linework, shared with the logo mark - rather than colours sampled off the
+   source drawing, so the mascot, the mark and the theme are one palette. The
+   drawing's own purples were a desaturated shade off that triad; this block is
+   the only place the mapping lives, and light/dark comes from the tokens.
+
+       shade  -> haunches, feet, eyelid ridges   (the shadow side)
+       base   -> body, head, ears, limbs         (the violet armour)
+       accent -> belly, eyes                     (the lit extremity)
+       line   -> headband, pupils, mouth, nose   (linework)
+
+   The value *relationships* are kept from the drawing: shade sits 1.3:1 under
+   base and the linework 1.6:1 under it, which is what the original does, so
+   swapping the hues doesn't flatten him.
+
+   Everything here animates only transform/opacity so it runs on the compositor
+   and doesn't compete with hand tracking on the main thread. All motion stops
+   under prefers-reduced-motion (bottom of file). */
+
+.mascot {
+  --frog-base: var(--eva-base);
+  --frog-shade: var(--eva-shade);
+  --frog-ink: var(--eva-line);
+  --frog-lime: var(--eva-accent);
+
+  --gaze-x: 0;
+  --gaze-y: 0;
+  --bob-duration: 3.4s;
+  --breath-duration: 4.6s;
+  --blink-period: 5.2s;
+  overflow: visible;
+  display: block;
+}
+
+/* --- Flat colour layers, in the order that reproduces the source art ------ */
+
+/* Each region is a separate path, and two paths that share an edge each
+   antialias against what is behind them - so their coverage sums to less than
+   one and the page shows through as a hairline. A half-unit stroke in the
+   shape's own colour makes neighbours overlap instead of abut. */
+.mascot__backing,
+.mascot__base,
+.mascot__shade,
+.mascot__belly,
+.mascot__eye,
+.mascot__band,
+.mascot__band-tail,
+.mascot__detail,
+.mascot__mouth,
+.mascot__pupil {
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+
+.mascot__backing,
+.mascot__base {
+  fill: var(--frog-base);
+  stroke: var(--frog-base);
+}
+
+.mascot__shade {
+  fill: var(--frog-shade);
+  stroke: var(--frog-shade);
+}
+
+.mascot__belly,
+.mascot__eye {
+  fill: var(--frog-lime);
+  stroke: var(--frog-lime);
+}
+
+.mascot__band,
+.mascot__band-tail,
+.mascot__detail,
+.mascot__mouth,
+.mascot__pupil {
+  fill: var(--frog-ink);
+  stroke: var(--frog-ink);
+}
+
+/* --- Motion -------------------------------------------------------------- */
+
+.mascot__float {
+  transform-origin: 100px 150px;
+  animation: mascot-bob var(--bob-duration) ease-in-out infinite;
+}
+
+@keyframes mascot-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.1deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(1.1deg);
+  }
+}
+
+.mascot__shadow {
+  fill: rgba(30, 19, 48, 0.16);
+  transform-origin: 98px 194px;
+  animation: mascot-shadow var(--bob-duration) ease-in-out infinite;
+}
+
+@keyframes mascot-shadow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(0.88);
+    opacity: 0.35;
+  }
+}
+
+/* Breathing, anchored at the ground so he swells upward rather than sinking.
+   Slower than the bob and on its own cycle, so the two never lock into a single
+   mechanical rhythm. */
+.mascot__breathe {
+  transform-origin: 98px 192px;
+  animation: mascot-breathe var(--breath-duration) ease-in-out infinite;
+}
+
+@keyframes mascot-breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.02, 1.013);
+  }
+}
+
+/* Pivot at the knot behind the right ear, so the tails swing from where they
+   are actually tied. The angle stays small: the shape reaches back under the
+   head, and a wide swing would drag that overlap out into the open. */
+.mascot__band-tail {
+  transform-origin: 152px 40px;
+  animation: mascot-tail 2.3s ease-in-out infinite;
+}
+
+@keyframes mascot-tail {
+  0%,
+  100% {
+    transform: rotate(-3.5deg);
+  }
+  50% {
+    transform: rotate(4.5deg);
+  }
+}
+
+/* --- Face ---------------------------------------------------------------- */
+
+.mascot__pupils {
+  /* Cursor-following glance. Small range keeps it cute, not googly - and keeps
+     the slit inside the eye it belongs to. */
+  transform: translate(calc(var(--gaze-x) * 3px), calc(var(--gaze-y) * 2px));
+  transition: transform 0.18s ease-out;
+}
+
+/* Looking up and away, as if working something out. */
+.mascot--thinking .mascot__pupils {
+  transform: translate(2.5px, -2.5px);
+}
+
+.mascot__squint {
+  fill: none;
+  stroke: var(--frog-ink);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+}
+
+.mascot__grin {
+  fill: none;
+  stroke: var(--frog-ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.mascot__lid {
+  /* The lid is a slice of the face, so it takes the body colour. */
+  fill: var(--frog-base);
+  transform-box: fill-box;
+  transform-origin: center top;
+  transform: scaleY(0);
+  animation: mascot-blink var(--blink-period) ease-in-out infinite;
+}
+
+/* Lids drop and snap back inside a small slice of the cycle, so the character
+   mostly has its eyes open. */
+@keyframes mascot-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(0);
+  }
+  95%,
+  96.5% {
+    transform: scaleY(1);
+  }
+}
+
+/* --- Moods --------------------------------------------------------------- */
+
+.mascot--happy .mascot__float,
+.mascot--cheer .mascot__float {
+  --bob-duration: 1.5s;
+}
+
+.mascot--happy .mascot__breathe,
+.mascot--cheer .mascot__breathe {
+  --breath-duration: 2.4s;
+}
+
+.mascot--cheer .mascot__band-tail {
+  animation-duration: 0.7s;
+}
+
+.mascot__sparkles {
+  opacity: 0;
+}
+
+.mascot__sparkle {
+  fill: var(--frog-lime);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mascot--cheer .mascot__sparkles {
+  opacity: 1;
+}
+
+.mascot--cheer .mascot__sparkle {
+  animation: mascot-sparkle 1.15s ease-in-out infinite;
+}
+
+.mascot--cheer .mascot__sparkle:nth-child(2) {
+  animation-delay: 0.22s;
+}
+
+.mascot--cheer .mascot__sparkle:nth-child(3) {
+  animation-delay: 0.44s;
+}
+
+@keyframes mascot-sparkle {
+  0%,
+  100% {
+    transform: scale(0.4) rotate(0deg);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(1.15) rotate(35deg);
+    opacity: 1;
+  }
+}
+
+/* --- Reduced motion ------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* The mood rules that set these animations are more specific than a bare
+     class, so the resets have to match that specificity to win. */
+  .mascot__float,
+  .mascot__shadow,
+  .mascot__breathe,
+  .mascot__band-tail,
+  .mascot--cheer .mascot__band-tail,
+  .mascot__lid,
+  .mascot--cheer .mascot__sparkle {
+    animation: none;
+  }
+
+  .mascot__float,
+  .mascot__breathe,
+  .mascot__band-tail {
+    transform: none;
+  }
+
+  /* Keep the lids fully open rather than frozen mid-blink. */
+  .mascot__lid {
+    transform: scaleY(0);
+  }
+
+  .mascot__pupils {
+    transform: none;
+    transition: none;
+  }
+
+  .mascot--cheer .mascot__sparkles {
+    opacity: 1;
+  }
+}

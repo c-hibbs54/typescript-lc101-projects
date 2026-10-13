@@ -1,0 +1,142 @@
+.practice__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 640px) minmax(260px, 360px);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .practice__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.practice__target {
+  --card-edge: var(--color-accent);
+  --panel-edge-w: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.practice__target-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* The target letter is the page's hero: oversized oblique glyph on an angled
+   violet slab. */
+.practice__target-glyph {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-items: center;
+  align-self: center;
+  min-width: 4.25rem;
+  padding: 0.15rem 0.85rem 0.25rem;
+  font-size: 3rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  color: var(--color-on-accent);
+}
+
+.practice__target-glyph::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-accent);
+  transform: skewX(var(--slab-skew));
+}
+
+.practice__target-glyph::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  z-index: -1;
+  background: var(--color-lime-vivid);
+  transform: skewX(var(--slab-skew));
+}
+
+.practice__target-status {
+  text-align: center;
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.practice__hint {
+  position: relative;
+  isolation: isolate;
+  padding: 0.85rem 1rem;
+  clip-path: var(--panel-cut);
+  background: var(--color-accent);
+}
+
+.practice__hint::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  background: var(--color-accent-soft);
+  clip-path: var(--panel-cut);
+}
+
+.practice__hint p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.practice__candidates {
+  border-top: 3px solid var(--color-border);
+  padding-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.practice__candidates h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.practice__no-hand {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.practice__candidate-row {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.practice__candidate-row > span:first-child {
+  font-weight: 900;
+  font-style: italic;
+}
+
+.practice__candidate-pct {
+  text-align: right;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}

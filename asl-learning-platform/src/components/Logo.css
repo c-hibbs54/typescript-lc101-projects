@@ -1,0 +1,33 @@
+/* The mark carries two of the three EVA-01 character tones - the acid green and
+   the linework - and picks up the violet from the wordmark beside it. */
+
+.logo {
+  display: block;
+  flex: none;
+  overflow: visible;
+}
+
+.logo__fill {
+  fill: var(--eva-accent);
+  /* Neighbouring traced regions abut exactly, and each antialiases against what
+     is behind it, so their coverage sums to less than one and a hairline of page
+     shows through. A thin stroke in the same colour overlaps them instead. */
+  stroke: var(--eva-accent);
+  stroke-width: 0.35;
+  stroke-linejoin: round;
+}
+
+/* currentColor, not a pinned black: the mark inherits the text colour of
+   whatever it sits in, so it stays legible in both themes.
+   evenodd is required, not cosmetic: this path is the outline plus the areas it
+   encloses, and the tracer walks every ring in the same direction, so under the
+   default nonzero rule the enclosed areas fill in and the mark becomes a blob. */
+.logo__line {
+  fill: currentColor;
+  fill-rule: evenodd;
+}
+
+.logo__ring {
+  fill: none;
+  stroke: currentColor;
+}

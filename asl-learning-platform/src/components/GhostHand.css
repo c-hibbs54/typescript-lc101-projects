@@ -1,0 +1,139 @@
+/* Ghost-hand reference illustration, in the app's three-tone art style:
+   deep purple shade / violet base / green accent tips, over dark linework.
+   Colours come from the --art-* tokens in index.css (see the art-direction
+   note there), never hardcoded, so light and dark themes both follow. */
+
+.ghost-hand {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  /* Default role, in case a hand is ever drawn without a role modifier: the
+     violet main-hand tones. A role class on the hand's own <g> overrides these. */
+  --tone-shade: var(--art-shade);
+  --tone-base: var(--art-base);
+  --tone-accent: var(--art-accent);
+  --tone-glow: var(--art-glow);
+  perspective: 700px;
+  margin: 0 auto;
+}
+
+.ghost-hand__stage {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: ghost-hand-idle 7s ease-in-out infinite;
+  transition: transform 0.2s ease-out;
+}
+
+@keyframes ghost-hand-idle {
+  0%,
+  100% {
+    transform: rotateX(calc(6deg + var(--tilt-x))) rotateY(calc(-14deg + var(--tilt-y)));
+  }
+  50% {
+    transform: rotateX(calc(6deg + var(--tilt-x))) rotateY(calc(14deg + var(--tilt-y)));
+  }
+}
+
+.ghost-hand__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* --- Role tones ----------------------------------------------------------- */
+
+.ghost-hand__hand--primary {
+  --tone-shade: var(--art-shade);
+  --tone-base: var(--art-base);
+  --tone-accent: var(--art-accent);
+  --tone-glow: var(--art-glow);
+}
+
+.ghost-hand__hand--secondary {
+  --tone-shade: var(--art-shade-support);
+  --tone-base: var(--art-base-support);
+  --tone-accent: var(--art-accent-support);
+  --tone-glow: var(--art-accent-support);
+  /* Sits behind the dominant hand, so it eases back slightly. */
+  opacity: 0.9;
+}
+
+/* --- Gradient stops (violet base -> green tip) ---------------------------- */
+
+.ghost-hand__stop-base {
+  stop-color: var(--tone-base);
+}
+
+.ghost-hand__stop-mid {
+  stop-color: color-mix(in srgb, var(--tone-base) 55%, var(--tone-accent) 45%);
+}
+
+.ghost-hand__stop-accent {
+  stop-color: var(--tone-accent);
+}
+
+/* --- Glow ---------------------------------------------------------------- */
+
+.ghost-hand__glow {
+  opacity: 0.5;
+  filter: blur(7px);
+}
+
+.ghost-hand__glow path {
+  fill: var(--tone-glow);
+  stroke: var(--tone-glow);
+  stroke-width: 20;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- Palm --------------------------------------------------------------- */
+
+.ghost-hand__palm-line {
+  fill: var(--art-line);
+  stroke: var(--art-line);
+  stroke-width: 9;
+  stroke-linejoin: round;
+}
+
+.ghost-hand__palm {
+  fill: var(--tone-base);
+  stroke: none;
+}
+
+/* Third tone: the shadowed hollow of the palm and the thenar pad. Clipped to
+   the palm silhouette, so it shades without changing the outline. */
+.ghost-hand__palm-shade {
+  fill: var(--tone-shade);
+  opacity: 0.5;
+  filter: blur(6px);
+}
+
+/* --- Digits ------------------------------------------------------------- */
+
+/* Digits are filled tapered silhouettes, not stroked centre-lines: real fingers
+   narrow toward the tip, and a uniform stroke reads as a sausage. The linework
+   is the same path stroked underneath, so the outline follows the taper. */
+.ghost-hand__digit-line {
+  fill: var(--art-line);
+  stroke: var(--art-line);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+
+.ghost-hand__digit {
+  stroke: none;
+}
+
+/* Fingernail: the lightest of the three tones. */
+.ghost-hand__nail {
+  fill: color-mix(in srgb, var(--tone-accent) 62%, #fff 38%);
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost-hand__stage {
+    animation: none;
+    transform: rotateX(6deg) rotateY(-8deg);
+  }
+}

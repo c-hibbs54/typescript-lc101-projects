@@ -1,0 +1,204 @@
+.webcam-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.webcam-panel__stage {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 4 / 3;
+  background: #0b0b14;
+  border-radius: 0;
+  clip-path: var(--panel-cut);
+  overflow: hidden;
+  filter: drop-shadow(5px 5px 0 var(--drop-hard));
+}
+
+.webcam-panel__video,
+.webcam-panel__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+}
+
+.webcam-panel__video {
+  object-fit: cover;
+}
+
+.webcam-panel__overlay {
+  transform: none;
+}
+
+/* Angled violet bar welded to the top edge of the viewfinder. */
+.webcam-panel__stage::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 46%;
+  height: 6px;
+  z-index: 3;
+  background: var(--color-lime-vivid);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  pointer-events: none;
+}
+
+.webcam-panel__overlay-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  color: #fff;
+  background: rgba(11, 11, 20, 0.72);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+.webcam-panel__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.webcam-panel__fps {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Stacked HUD controls over the top-right of the video stage. */
+.webcam-panel__hud {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.9rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  max-width: calc(100% - 1.8rem);
+}
+
+.webcam-panel__hud-control {
+  max-width: 100%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Left square on purpose: a clip-path here would clip this native control's
+   focus outline away, and a <select> is not worth a bespoke focus treatment. */
+.webcam-panel__camera-select {
+  padding: 0.32rem 0.55rem;
+  cursor: pointer;
+}
+
+.webcam-panel__camera-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.webcam-panel__hand-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.22rem 0.28rem 0.22rem 0.5rem;
+}
+
+.webcam-panel__hand-picker-label {
+  font-size: 0.64rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.webcam-panel__hand-picker-options {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.webcam-panel__hand-option {
+  position: relative;
+  isolation: isolate;
+  padding: 0.2rem 0.5rem;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: color var(--dur-snap) ease;
+}
+
+.webcam-panel__hand-option::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: transparent;
+  transform: skewX(var(--slab-skew));
+  transition: background-color var(--dur-snap) ease;
+}
+
+.webcam-panel__hand-option:hover {
+  color: var(--color-text);
+}
+
+.webcam-panel__hand-option:hover::before {
+  background: var(--color-surface-hover);
+}
+
+/* The chosen hand is the one drawn violet, so the selected chip borrows the
+   same token as the primary-hand overlay. */
+.webcam-panel__hand-option[aria-pressed='true'] {
+  color: var(--color-on-accent);
+}
+
+.webcam-panel__hand-option[aria-pressed='true']::before {
+  background: var(--hand-primary);
+}
+
+/* Tighter than the global 4px: these chips sit inside a small HUD box, and
+   their slab is short enough that 2px already clears the skew overhang. */
+.webcam-panel__hand-option:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Non-blocking notice for a failed camera switch; the previous camera is still
+   live, so this must not cover the video or disable anything. Body text stays
+   at full contrast and the warning colour carries the alarm as an edge, rather
+   than tinting the text down to a marginal ratio. */
+.webcam-panel__switch-error {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-warning-soft);
+  border-left: 5px solid var(--color-warning);
+  border-radius: 0;
+}

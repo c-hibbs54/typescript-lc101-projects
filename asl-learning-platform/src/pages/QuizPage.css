@@ -1,0 +1,61 @@
+.quiz {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.quiz--finished {
+  align-items: center;
+}
+
+.quiz__summary {
+  --card-edge: var(--color-accent);
+  --panel-edge-w: 4px;
+  --channel-accent: var(--color-lime-vivid);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 2.75rem 2.5rem;
+}
+
+.quiz__summary h1 {
+  margin: 0;
+}
+
+/* Score set as a single graphic figure on an angled slab. */
+.quiz__score {
+  position: relative;
+  isolation: isolate;
+  padding: 0.2rem 1.15rem 0.35rem;
+  font-size: clamp(2.4rem, 9vw, 3.2rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  color: var(--color-on-lime);
+  margin: 0;
+}
+
+.quiz__score::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-lime-vivid);
+  transform: skewX(var(--slab-skew));
+}
+
+.quiz__feedback {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* A missed question is a state, not styling, so it uses the warning colour. */
+.quiz__feedback--miss {
+  color: var(--color-warning);
+}

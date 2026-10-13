@@ -1,0 +1,187 @@
+.navbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding: 0.6rem 1.5rem 0;
+  background: var(--color-surface);
+  border-bottom: 4px solid var(--color-accent);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+/* Lime shard riding the violet base rule - the one place the third tone lands
+   on the chrome itself. */
+.navbar::after {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  bottom: -4px;
+  width: 88px;
+  height: 4px;
+  background: var(--color-lime-vivid);
+  transform: skewX(var(--slab-skew));
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-text);
+  text-decoration: none;
+  padding: 0.4rem 0 0.7rem;
+}
+
+.navbar__wordmark {
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.35rem;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+/* The violet half of the lockup. `--color-accent` rather than the character
+   token `--eva-base`: this is text, and the character violet is pinned dark in
+   both modes, which would only reach 1.9:1 on a dark surface. */
+.navbar__wordmark-accent {
+  color: var(--color-accent);
+}
+
+.navbar__links {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+}
+
+/* Parallelogram tab. The skew lives on the pseudo-element so both labels stay
+   upright and fully legible; only the slab behind them is angled. */
+.navbar__link {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.2rem;
+  padding: 0.5rem 0.85rem 0.5rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--dur-snap) ease;
+}
+
+.navbar__link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: transparent;
+  transform: skewX(var(--slab-skew)) scaleY(0.82);
+  transform-origin: bottom;
+  transition: background-color var(--dur-snap) ease, transform var(--dur-snap) var(--ease-snap);
+}
+
+.navbar__link-en {
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+}
+
+.navbar__link .navbar__link-ja {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+}
+
+/* Kinetic selection: hovering snaps the slab up to full height under the
+   label. It settles - it does not keep moving. */
+/* Lime underscore welded to the navbar's base rule; it slides out from the left
+   on hover and stays put once a tab is current. */
+.navbar__link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  z-index: -1;
+  background: var(--color-lime-vivid);
+  transform: skewX(var(--slab-skew)) scaleX(0);
+  transform-origin: left bottom;
+  transition: transform var(--dur-snap) var(--ease-snap);
+}
+
+.navbar__link:hover {
+  color: var(--color-text);
+}
+
+.navbar__link:hover::before {
+  background: var(--color-accent-soft);
+  transform: skewX(var(--slab-skew)) scaleY(1);
+}
+
+.navbar__link:hover::after,
+.navbar__link--active::after {
+  transform: skewX(var(--slab-skew)) scaleX(1);
+}
+
+.navbar__link--active,
+.navbar__link--active:hover {
+  color: var(--color-on-accent);
+}
+
+.navbar__link--active::before,
+.navbar__link--active:hover::before {
+  background: var(--color-accent);
+  transform: skewX(var(--slab-skew)) scaleY(1);
+}
+
+.navbar__link--active .navbar__link-ja {
+  --ja-color: color-mix(in srgb, currentColor 80%, transparent);
+}
+
+/* The underscore is a travelling shape, so under reduced motion it is simply
+   present rather than sliding into place. */
+@media (prefers-reduced-motion: reduce) {
+  .navbar__link::after {
+    transform: skewX(var(--slab-skew)) scaleX(0);
+  }
+
+  .navbar__link:hover::after,
+  .navbar__link--active::after {
+    transform: skewX(var(--slab-skew)) scaleX(1);
+  }
+}
+
+@media (max-width: 560px) {
+  .navbar {
+    padding: 0.5rem 1rem 0;
+    gap: 0.5rem;
+  }
+
+  .navbar::after {
+    left: 1rem;
+    width: 64px;
+  }
+
+  .navbar__wordmark {
+    font-size: 1.15rem;
+  }
+
+  .navbar__link {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .navbar__link-en {
+    font-size: 0.82rem;
+  }
+
+  .navbar__link .navbar__link-ja {
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+}

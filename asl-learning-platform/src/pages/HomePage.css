@@ -1,0 +1,143 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+}
+
+.home__hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.home__hero-copy {
+  flex: 1 1 380px;
+  max-width: 640px;
+}
+
+.home__hero .page-heading__title {
+  font-size: clamp(2.1rem, 6.4vw, 3.35rem);
+  max-width: 20ch;
+}
+
+/* Angled violet slab behind the companion, so the illustration sits on a shape
+   instead of floating on the page. */
+.home__mascot-stage {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem 1.75rem;
+  flex: 0 0 auto;
+}
+
+.home__mascot-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-accent-soft);
+  transform: skewX(var(--slab-skew));
+  clip-path: var(--panel-cut);
+}
+
+.home__mascot-stage::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 0;
+  height: 6px;
+  z-index: -1;
+  background: var(--color-lime-vivid);
+  transform: skewX(var(--slab-skew));
+}
+
+.home__cta {
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+  flex-wrap: wrap;
+}
+
+.home__band {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.home__features {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+.home__feature {
+  padding-top: 1.15rem;
+}
+
+/* Oversized index numeral: the graphic device that numbers a menu band. */
+.home__feature-index {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--channel-accent, var(--color-lime-vivid));
+  margin-bottom: 0.35rem;
+}
+
+.home__feature h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.02rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-style: italic;
+  font-weight: 900;
+}
+
+.home__feature p {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* Three-tone rotation across the band, matching the stat row above it. The
+   numeral borrows whichever tone the tile's top edge is using; on the violet
+   tile it steps to the deeper violet so it stays readable on the surface. */
+.home__features .home__feature:nth-child(3n + 1) {
+  --channel-accent: var(--color-lime-vivid);
+}
+
+.home__features .home__feature:nth-child(3n + 1) .home__feature-index {
+  color: var(--color-lime-strong);
+}
+
+.home__features .home__feature:nth-child(3n + 2) {
+  --channel-accent: var(--color-accent);
+}
+
+.home__features .home__feature:nth-child(3n + 3) {
+  --channel-accent: var(--color-highlight-vivid);
+}
+
+.home__features .home__feature:nth-child(3n + 3) .home__feature-index {
+  color: var(--color-highlight-strong);
+}
+
+@media (max-width: 560px) {
+  .home {
+    gap: 2rem;
+  }
+
+  .home__hero {
+    gap: 1.25rem;
+  }
+
+  .home__mascot-stage {
+    margin: 0 auto;
+    padding: 1rem 1.25rem;
+  }
+}

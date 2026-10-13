@@ -1,0 +1,11 @@
+.practice {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* The heading row on this page carries a "skip" action, so the title block and
+   the button share the same baseline diagonal. */
+.practice .section-heading {
+  align-items: flex-end;
+}

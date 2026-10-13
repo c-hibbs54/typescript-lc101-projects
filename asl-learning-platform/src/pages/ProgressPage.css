@@ -1,0 +1,105 @@
+.progress-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.progress-page__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.progress-page__row {
+  --card-edge: var(--color-border);
+  --cut: 10px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 1.15rem;
+}
+
+/* Letter on an angled violet chip, so the list reads as a rank of tiles. */
+.progress-page__letter {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  min-width: 2.3rem;
+  padding: 0.1rem 0.45rem 0.15rem;
+  font-size: 1.3rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--color-on-accent);
+}
+
+.progress-page__letter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-accent);
+  transform: skewX(var(--slab-skew));
+}
+
+.progress-page__row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Destructive band: red edge, because this really is the danger zone. Theme
+   tones carry the design language; this carries a warning. */
+.progress-page__danger {
+  --card-edge: var(--color-danger);
+  --panel-edge-w: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.progress-page__danger h3 {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.progress-page__danger p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  max-width: 52ch;
+}
+
+.progress-page__confirm {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 560px) {
+  .progress-page__row {
+    gap: 0.7rem;
+    padding: 0.6rem 0.85rem;
+  }
+
+  .progress-page__letter {
+    min-width: 2rem;
+    font-size: 1.1rem;
+  }
+}

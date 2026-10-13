@@ -1,0 +1,844 @@
+:root {
+  color-scheme: light dark;
+
+  --color-bg: #f5f1fb;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f2ebfb;
+  --color-border: #e1d4f5;
+  --color-text: #1e1330;
+  --color-text-muted: #6b5c85;
+
+  /* Deep-violet / acid-green / warm-orange: the whole app's accent triad. */
+  --color-accent: #5b2a86;
+  --color-accent-strong: #431f66;
+  --color-accent-soft: #ece1fa;
+
+  --color-lime: #6fae0c;
+  --color-lime-strong: #52840a;
+  --color-lime-soft: #e8f6d2;
+  --color-lime-vivid: #9fe000;
+
+  --color-highlight: #e6650a;
+  --color-highlight-strong: #c2550a;
+  --color-highlight-soft: #fde9d7;
+  --color-highlight-vivid: #ff7a1a;
+
+  /* Strong lime, not plain: the plain tone only reaches ~3.0:1 on white, which
+     is why success text previously bypassed this token entirely. */
+  --color-success: var(--color-lime-strong);
+  --color-success-soft: var(--color-lime-soft);
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+  /* Ink that stays legible on the danger fill; flips per theme. */
+  --color-on-danger: #ffffff;
+
+  /* ------------------------------------------------------------------ *
+   * ANGULAR DESIGN LANGUAGE
+   * Heavy oblique type, skewed slabs, corner-cut panels. Two rules keep
+   * it legible: a slab is always drawn by a *pseudo-element* that carries
+   * the skew, so the text on top of it stays upright; and every skew uses
+   * the same angle so the whole page shares one diagonal.
+   * ------------------------------------------------------------------ */
+  --slab-skew: -9deg;
+  /* Corner-cut size for panels; `--panel-cut` is reused by a panel's inner
+     fill layer, where the percentages resolve against the smaller box and
+     therefore land parallel to the outer edge. */
+  --cut: 18px;
+  --panel-cut: polygon(
+    0 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+  --panel-edge-w: 2px;
+  /* A panel's default frame: the neutral border pulled toward the violet so a
+     flat white slab still has a drawn edge. */
+  --color-edge: color-mix(in srgb, var(--color-accent) 26%, var(--color-border));
+
+  /* Snappy, slightly overshooting: selection should *arrive*, not glide. */
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.25, 1.2);
+  --dur-snap: 150ms;
+
+  /* Moving highlight on progress fills. Deliberately a neutral white sheen:
+     blending the violet and the green directly produces mud. */
+  --progress-sheen: rgba(255, 255, 255, 0.34);
+
+  /* Fixed near-black for text sitting on a vivid lime/orange fill. It has to
+     be mode-independent, because those fills are bright in both modes. */
+  --color-ink: #14101d;
+  --color-on-accent: #ffffff;
+  --color-on-lime: var(--color-ink);
+  --color-on-highlight: var(--color-ink);
+
+  /* Focus ring. Deliberately its own token rather than `--color-highlight`:
+     the ring has to clear 3:1 against whatever it lands on, which means the
+     darker orange on pale surfaces and the lighter one on dark surfaces.
+     (`--color-highlight` itself only reaches 2.94:1 against the violet.) */
+  --color-focus: var(--color-highlight-strong);
+
+  /* Hand-role convention, used by both the live overlay and the ghost-hand
+     reference illustrations: the main/dominant signing hand is ALWAYS violet,
+     a supporting second hand is ALWAYS green. Single source of truth - don't
+     hardcode these two colours anywhere else. */
+  --hand-primary: #7c3aed;
+  --hand-primary-glow: #a855f7;
+  --hand-secondary: #4d9a0f;
+  --hand-secondary-glow: #7cc82a;
+
+  /* THREE-TONE ART DIRECTION (see the reference sheet this was matched to).
+     Every illustrated thing - reference hands, mascot, future characters -
+     is built from exactly three tones plus dark linework:
+       1. shade  - deep purple, the shadow side
+       2. base   - mid violet, the body colour
+       3. accent - green, the lit extremity (fingertips, highlights)
+     ...outlined in `--art-line` and haloed in `--art-glow`. */
+  --art-shade: #4c2170;
+  --art-base: #8b5cc4;
+  --art-accent: #a8d84a;
+  --art-line: #2f1b45;
+  --art-glow: #b07de0;
+
+  /* The supporting hand keeps the same three-tone construction, but its base
+     and accent swap toward green so role still reads at a glance. */
+  --art-shade-support: #2f5c10;
+  --art-base-support: #6a9e34;
+  --art-accent-support: #cbe86b;
+
+  /* EVA-01 CHARACTER TONES - the mascot and the logo mark.
+     The same three-tone construction as --art-*, but drawn straight from the
+     EVA-01 triad and pinned dark-side-up in both modes. The --art-* tones lift
+     on a dark page so a small reference illustration stays legible; a large
+     character can't take that lift without going lavender, and the unit's
+     violet armour is the whole point. Linework is separate, as ever. */
+  --eva-shade: var(--color-accent-strong);
+  --eva-base: var(--color-accent);
+  --eva-accent: var(--color-lime-vivid);
+  --eva-line: #1c1129;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+  --shadow-sm: 0 1px 2px rgba(30, 19, 48, 0.07);
+  --shadow-md: 0 8px 24px rgba(30, 19, 48, 0.14);
+  --shadow-channel: 0 2px 4px rgba(30, 19, 48, 0.08), 0 10px 24px rgba(91, 42, 134, 0.14);
+  --shadow-channel-hover: 0 4px 8px rgba(30, 19, 48, 0.1), 0 16px 32px rgba(91, 42, 134, 0.22);
+
+  /* Hard offset shadow, applied with `filter: drop-shadow` so it follows a
+     clipped silhouette instead of the untouched rectangle. */
+  --drop-hard: rgba(30, 19, 48, 0.2);
+  --drop-hard-lift: rgba(30, 19, 48, 0.26);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #100a1c;
+    --color-surface: #1b1329;
+    --color-surface-hover: #251a38;
+    --color-border: #362548;
+    --color-text: #f1ecff;
+    --color-text-muted: #b6a8cf;
+
+    --color-accent: #b28aff;
+    --color-accent-strong: #cbb0ff;
+    --color-accent-soft: #2c2148;
+
+    --color-lime: #a9e34d;
+    --color-lime-strong: #c3ef7c;
+    --color-lime-soft: #23361a;
+    --color-lime-vivid: #b6ff2e;
+
+    --color-highlight: #ff9a44;
+    --color-highlight-strong: #ffb066;
+    --color-highlight-soft: #3a2410;
+    --color-highlight-vivid: #ff8a2e;
+
+    --color-warning: #fbbf24;
+    --color-warning-soft: #3a2c0c;
+    --color-danger: #f87171;
+    --color-danger-soft: #3a1414;
+    /* The dark-theme danger red is light, so it takes dark ink. */
+    --color-on-danger: #1c1129;
+
+    /* The violet is a light tint on dark, so text on top of it flips to ink. */
+    --color-on-accent: var(--color-ink);
+    --color-edge: color-mix(in srgb, var(--color-accent) 34%, var(--color-border));
+    --progress-sheen: rgba(255, 255, 255, 0.26);
+    /* Flips to the lighter orange: on a near-black page the dark orange would
+       disappear. 9.2:1 against the page background. */
+    --color-focus: var(--color-highlight);
+
+    /* Brighter on dark backgrounds; same violet-primary / green-secondary convention. */
+    --hand-primary: #a97bff;
+    --hand-primary-glow: #c4a2ff;
+    --hand-secondary: #8fd63a;
+    --hand-secondary-glow: #b6ff2e;
+
+    /* Same three tones, lifted so the artwork doesn't sink into a dark page.
+       Linework stays dark but softens, or it reads as holes at this contrast. */
+    --art-shade: #5f2d8a;
+    --art-base: #a276d8;
+    --art-accent: #bce85e;
+    --art-line: #1c1129;
+    --art-glow: #c79bf0;
+
+    --art-shade-support: #3d7418;
+    --art-base-support: #86bf47;
+    --art-accent-support: #d8f582;
+
+    /* Lifted only far enough to clear a near-black page - 4.3:1 of silhouette
+       against the background - while staying recognisably the violet armour.
+       Deliberately NOT the UI accent, which goes pale lavender here. */
+    --eva-shade: #4b2172;
+    --eva-base: #6f39a4;
+    --eva-line: #150c22;
+
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-channel: 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 26px rgba(178, 138, 255, 0.16);
+    --shadow-channel-hover: 0 4px 10px rgba(0, 0, 0, 0.35), 0 18px 36px rgba(178, 138, 255, 0.26);
+
+    --drop-hard: rgba(0, 0, 0, 0.55);
+    --drop-hard-lift: rgba(0, 0, 0, 0.7);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background:
+    radial-gradient(1200px 480px at 12% -10%, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent),
+    radial-gradient(900px 420px at 110% 0%, color-mix(in srgb, var(--color-lime-vivid) 8%, transparent), transparent),
+    var(--color-bg);
+  background-attachment: fixed;
+  color: var(--color-text);
+}
+
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Above the fixed AmbientBackground (z-index 0). */
+  position: relative;
+  z-index: 1;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.25rem 1.5rem 4rem;
+}
+
+@media (max-width: 520px) {
+  .app-main {
+    padding: 1.5rem 1rem 3rem;
+  }
+}
+
+/* --- Typography ---------------------------------------------------------- *
+   Titles are the loudest thing on the page: black weight, uppercase, oblique,
+   letter-spacing pulled tight so the word reads as one graphic block. */
+
+h1,
+h2,
+h3 {
+  line-height: 1.08;
+}
+
+h1,
+h2 {
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(1.85rem, 5.2vw, 2.85rem);
+  margin: 0 0 0.6rem;
+}
+
+/* Section titles get a skewed violet tick, so every band on the page starts
+   on the same diagonal. */
+h2 {
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+  position: relative;
+  padding-left: 0.95rem;
+  margin: 0 0 0.35rem;
+}
+
+/* Two-tone tick: a lime cap over a violet bar, skewed onto the page diagonal. */
+h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.04em;
+  bottom: 0.04em;
+  width: 7px;
+  background: linear-gradient(var(--color-lime-vivid) 0 42%, var(--color-accent) 42%);
+  transform: skewX(var(--slab-skew));
+}
+
+h3 {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+/* 4px of offset, not 2: a skewed slab pseudo-element leans ~3px past its own
+   border box at two corners, and a ring sitting closer than that would touch
+   the violet fill (2.2:1) instead of the page background (4.1:1). */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+/* --- Skewed slab primitive ----------------------------------------------- *
+   `.slab` keeps its own box (and therefore its own upright text) and pushes
+   the parallelogram into a pseudo-element behind the content. Nothing that
+   carries text is ever itself skewed, so nothing needs counter-skewing to
+   stay readable. */
+
+.slab {
+  position: relative;
+  isolation: isolate;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.slab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--slab-fill, var(--color-accent));
+  box-shadow: var(--slab-ring, none);
+  transform: skewX(var(--slab-skew));
+  transition: background-color var(--dur-snap) ease, transform var(--dur-snap) var(--ease-snap),
+    box-shadow var(--dur-snap) ease;
+}
+
+/* Thin accent edge riding the bottom of a slab. */
+.slab--edged::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  z-index: -1;
+  background: var(--slab-edge, var(--color-lime-vivid));
+  transform: skewX(var(--slab-skew));
+  transition: transform var(--dur-snap) var(--ease-snap);
+}
+
+/* --- Panels -------------------------------------------------------------- *
+   A card is a flat slab with two opposite corners sliced off. The element
+   itself paints the edge colour; an inset pseudo-element paints the fill, so
+   the 2px edge follows the diagonals too (a border or inset shadow would
+   stop dead at the cut). */
+
+.card {
+  position: relative;
+  isolation: isolate;
+  background: var(--card-edge, var(--color-edge));
+  border: none;
+  border-radius: 0;
+  clip-path: var(--panel-cut);
+  filter: drop-shadow(4px 4px 0 var(--drop-hard));
+  padding: 1.4rem 1.5rem;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: var(--panel-edge-w);
+  z-index: -1;
+  background: var(--card-fill, var(--color-surface));
+  clip-path: var(--panel-cut);
+}
+
+/* `clip-path` clips an element's outline along with everything else, so a
+   focused panel would otherwise have its focus ring sliced away entirely.
+   Instead the panel thickens its own edge in the focus colour, which is drawn
+   inside the clipped silhouette and therefore always visible. */
+.card:focus-visible {
+  outline: none;
+  --card-edge: var(--color-focus);
+  --panel-edge-w: 5px;
+}
+
+/* "Channel" tile: a card that reads as pickable rather than static. Its
+   accent tick grows across the top edge on hover, and the whole tile snaps
+   up-left toward the reader. */
+.channel {
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--dur-snap) var(--ease-snap), filter var(--dur-snap) ease;
+}
+
+.channel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--channel-accent, var(--color-lime-vivid));
+  /* Angled tail, so even a 6px bar carries the page's diagonal. */
+  clip-path: polygon(0 0, 100% 0, calc(100% - 11px) 100%, 0 100%);
+  transform-origin: left top;
+  transform: scaleX(0.3);
+  transition: transform var(--dur-snap) var(--ease-snap);
+  pointer-events: none;
+}
+
+.channel:hover::before,
+.channel:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.channel:hover,
+.channel:focus-visible {
+  transform: translate(-3px, -3px);
+  filter: drop-shadow(8px 8px 0 var(--drop-hard-lift));
+}
+
+.channel:active {
+  transform: translate(1px, 1px);
+  filter: drop-shadow(2px 2px 0 var(--drop-hard));
+}
+
+/* --- Buttons ------------------------------------------------------------- *
+   Parallelogram fill, upright uppercase label. The label is a plain text node
+   in several pages, so the skew has to live on `::before` - it cannot be
+   counter-skewed on an inner wrapper that doesn't exist. */
+
+.btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.62rem 1.5rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.84rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform var(--dur-snap) var(--ease-snap), color var(--dur-snap) ease;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-fill, var(--color-accent));
+  box-shadow: var(--btn-ring, none);
+  transform: skewX(var(--slab-skew));
+  transition: background-color var(--dur-snap) ease, transform var(--dur-snap) var(--ease-snap),
+    box-shadow var(--dur-snap) ease;
+}
+
+/* Bottom accent edge: the small graphic tell that makes a plain rectangle
+   read as part of this system. */
+.btn::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  z-index: -1;
+  background: var(--btn-edge, transparent);
+  transform: skewX(var(--slab-skew));
+  transition: background-color var(--dur-snap) ease;
+}
+
+.btn:hover:not(:disabled)::before {
+  transform: skewX(var(--slab-skew)) scaleX(1.035);
+}
+
+.btn:active:not(:disabled) {
+  transform: translate(1px, 2px);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn--primary {
+  --btn-fill: var(--color-accent);
+  --btn-edge: var(--color-lime-vivid);
+  color: var(--color-on-accent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  --btn-fill: var(--color-accent-strong);
+}
+
+.btn--secondary {
+  --btn-fill: transparent;
+  --btn-ring: inset 0 0 0 2px var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  --btn-fill: var(--color-accent-soft);
+}
+
+/* Destructive, still inside the three-tone palette: dark ink on vivid orange
+   reads as a warning without adding a fourth hue. */
+/* Destructive actions are red, not a theme tone. The three-tone rule governs the
+   site's design language; a semantic state colour is doing a different job, and
+   dulling "delete everything" into the brand palette loses real information. */
+.btn--danger {
+  --btn-fill: var(--color-danger);
+  --btn-edge: var(--color-danger);
+  color: var(--color-on-danger);
+}
+
+.btn--danger:hover:not(:disabled) {
+  --btn-fill: color-mix(in srgb, var(--color-danger) 85%, #000 15%);
+}
+
+/* --- Badges -------------------------------------------------------------- */
+
+.badge {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.24rem 0.62rem;
+  border-radius: 0;
+  font-size: 0.66rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--badge-fill, var(--color-surface-hover));
+  box-shadow: var(--badge-ring, none);
+  transform: skewX(var(--slab-skew));
+}
+
+.badge--easy {
+  --badge-fill: var(--color-lime-vivid);
+  color: var(--color-on-lime);
+}
+
+.badge--medium {
+  --badge-fill: var(--color-highlight-vivid);
+  color: var(--color-on-highlight);
+}
+
+.badge--hard {
+  --badge-fill: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.badge--muted {
+  --badge-fill: transparent;
+  --badge-ring: inset 0 0 0 2px var(--color-border);
+  color: var(--color-text-muted);
+}
+
+/* --- Japanese secondary labels ------------------------------------------ *
+   Real section words, always lower-emphasis, never load-bearing: wherever one
+   sits inside a link or button it is marked aria-hidden so the accessible
+   name stays the English label alone. */
+
+.ja {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  /* Contexts that sit on a coloured slab set `--ja-color` rather than fighting
+     this rule's specificity. */
+  color: var(--ja-color, var(--color-text-muted));
+  line-height: 1;
+}
+
+.grid {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.grid--letters {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+
+/* --- Section headings --------------------------------------------------- *
+   Shared by every page (including the ones whose markup lives elsewhere), so
+   the treatment has to work from a bare `<h1>` plus an optional `<p>`. */
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 0.9rem;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+/* Two-tone diagonal rule: the mark that opens every page band. */
+.section-heading::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 136px;
+  height: 6px;
+  background: linear-gradient(90deg, var(--color-accent) 0 48%, var(--color-lime-vivid) 48%);
+  transform: skewX(var(--slab-skew));
+}
+
+.section-heading p {
+  color: var(--color-text-muted);
+  margin: 0.35rem 0 0;
+  max-width: 62ch;
+}
+
+.disclaimer {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-accent);
+  clip-path: var(--panel-cut);
+  padding: 1.15rem 1.35rem;
+  color: var(--color-text);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.disclaimer::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  background: var(--color-accent-soft);
+  clip-path: var(--panel-cut);
+}
+
+/* --- Stat tiles --------------------------------------------------------- *
+   Big oblique number, small tracked-out label. The three-tone rotation across
+   tiles is what makes a row of numbers read as designed rather than tabular. */
+
+.stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 1.35rem 1.25rem 1.2rem;
+}
+
+.stat-card__value {
+  font-size: clamp(2rem, 4.4vw, 2.6rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--stat-tone, var(--color-accent));
+}
+
+.stat-card__label {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.stat-grid .stat-card:nth-child(3n + 1) {
+  --channel-accent: var(--color-lime-vivid);
+  --stat-tone: var(--color-accent);
+}
+
+.stat-grid .stat-card:nth-child(3n + 2) {
+  --channel-accent: var(--color-accent);
+  --stat-tone: var(--color-lime-strong);
+}
+
+.stat-grid .stat-card:nth-child(3n + 3) {
+  --channel-accent: var(--color-highlight-vivid);
+  --stat-tone: var(--color-highlight-strong);
+}
+
+@media (max-width: 560px) {
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .stat-card {
+    padding: 1.1rem 1rem 1rem;
+  }
+
+  .stat-card__label {
+    letter-spacing: 0.08em;
+    font-size: 0.64rem;
+  }
+}
+
+/* --- Progress bars ------------------------------------------------------ */
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  border-radius: 0;
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 2px var(--color-border);
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+
+/* Flat violet bar with a hard lime cap at the leading edge. A violet-to-green
+   gradient reads as brown mud around its midpoint, so the two tones meet on a
+   hard edge instead of blending; the only moving part is a neutral sheen. */
+.progress-track__fill {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-accent);
+  box-shadow: inset -7px 0 0 var(--color-lime-vivid);
+  transition: width 0.1s linear;
+}
+
+.progress-track__fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 38%, var(--progress-sheen) 50%, transparent 62%);
+  background-size: 240% 100%;
+  animation: progress-shimmer 2.6s linear infinite;
+}
+
+@keyframes progress-shimmer {
+  from {
+    background-position: 240% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+/* Decorative channel tiles drift very slightly, so a resting page is never
+   fully static. Staggered per column via nth-child so they don't pulse in
+   lockstep.
+
+   Deliberately excludes interactive tiles (`:not(button)`): a click target that
+   never stops moving is harder to hit, which matters for anyone with limited
+   motor control - and it's the letter cards, the most-clicked thing in the app,
+   that are buttons. They still get the hover lift below. The same rule applies
+   to everything added since: only non-interactive decoration ever loops, and
+   interactive elements move only on a state change (hover/active/selected). */
+.channel:not(button) {
+  animation: channel-idle 7s ease-in-out infinite;
+}
+
+.channel:not(button):nth-child(2n) {
+  animation-delay: -2.3s;
+}
+
+.channel:not(button):nth-child(3n) {
+  animation-delay: -4.6s;
+}
+
+@keyframes channel-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Hover still wins: it re-declares transform with a heavier lift. */
+.channel:hover {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* `.channel:not(button)` out-specifies a bare `.channel`, so the reset has
+     to match that selector or the idle drift keeps running here. */
+  .progress-track__fill,
+  .progress-track__fill::after,
+  .channel,
+  .channel:not(button),
+  .channel:not(button):nth-child(2n),
+  .channel:not(button):nth-child(3n) {
+    animation: none;
+  }
+
+  /* Nothing moves: state changes still recolour, they just don't travel. */
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+
+  .channel,
+  .channel:hover,
+  .channel:focus-visible,
+  .channel:active {
+    transform: none;
+  }
+
+  .btn:hover:not(:disabled)::before,
+  .btn:active:not(:disabled) {
+    transform: skewX(var(--slab-skew));
+  }
+
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
+
+  .channel::before,
+  .channel:hover::before,
+  .channel:focus-visible::before {
+    transform: scaleX(1);
+  }
+}
