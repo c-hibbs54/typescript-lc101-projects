@@ -1,4 +1,4 @@
-import { FEATURE_NAMES, LETTER_PROTOTYPES } from './classifier'
+import { FEATURE_INDEX, LETTER_PROTOTYPES } from './classifier'
 import type { HandRole } from '../types/asl'
 
 /**
@@ -17,17 +17,19 @@ import type { HandRole } from '../types/asl'
  * classification, only to draw the ghost-hand reference illustration, so
  * approximate values are fine.
  *
- * Feature order matches classifier.ts's FEATURE_NAMES: [thumbCurl, indexCurl,
- * middleCurl, ringCurl, pinkyCurl, thumbToIndexMcp, thumbToPinkyMcp,
- * indexMiddleSpread, middleRingSpread, ringPinkySpread, handOrientation].
+ * Measured off the same forward hand model the classifier's prototypes come
+ * from (`handFixtures.ts`), because they have to be in the units everything
+ * here reads. See classifier.ts's FEATURE_NAMES for the order, and note the
+ * spreads are palm-relative distances that run past 1 for a splayed hand -
+ * which is why the geometry below clamps them.
  */
 const EXTRA_POSES: Record<string, number[]> = {
   // J traces a "J" in the air, but its held handshape is identical to I.
   J: LETTER_PROTOTYPES.I,
   // Z traces a "Z" with the index finger extended, other fingers curled.
-  Z: [0.5, 0.05, 0.85, 0.85, 0.85, 0.35, 0.6, 0.1, 0.1, 0.1, 0.08],
+  Z: [0.04, 0.02, 0.68, 0.68, 0.69, 0.58, 1.02, 0.5, 0.46, 0.34, 0.92, 0.23, 0.87, -0.57, 1.04, 1.37, 0.2, 0.22, 1.46, 0.54, 0.08],
   // I Love You: thumb, index, and pinky extended; middle and ring folded down.
-  ILY: [0.1, 0.1, 0.85, 0.85, 0.05, 0.55, 0.75, 0.5, 0.1, 0.55, 0.08],
+  ILY: [0.03, 0.02, 0.68, 0.68, 0.02, 0.58, 1.02, 0.5, 0.46, 0.77, 1.48, 0.79, 1.44, -1.09, 0.62, 1.37, 0.2, 1.08, 1.46, 0.58, 0.08],
 }
 
 /**
@@ -76,11 +78,6 @@ export function getGhostSign(signId: string): GhostSign | null {
 // ---------------------------------------------------------------------------
 // Handshape geometry
 // ---------------------------------------------------------------------------
-
-const FEATURE_INDEX = Object.fromEntries(FEATURE_NAMES.map((name, i) => [name, i])) as Record<
-  (typeof FEATURE_NAMES)[number],
-  number
->
 
 function clamp(v: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, v))
